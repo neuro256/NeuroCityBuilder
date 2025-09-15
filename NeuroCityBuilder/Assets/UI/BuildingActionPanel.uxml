@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles/PanelStyles.uss?fileID=7433441132597879392&amp;guid=b79d9fb00213a574087ce64dc631552f&amp;type=3#PanelStyles" />
+    <ui:Box name="building-action-panel" class="panel building-action-panel">
+        <ui:Button name="move-button" text="Move" class="panel-button" />
+        <ui:Button name="upgrade-button" text="Upgrade" class="panel-button" />
+        <ui:Button name="delete-button" text="Delete" class="delete-button" />
+    </ui:Box>
+</ui:UXML>
