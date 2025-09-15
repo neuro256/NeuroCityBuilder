@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+ <Style src="project://database/Assets/UI/Styles/PanelStyles.uss?fileID=7433441132597879392&amp;guid=b79d9fb00213a574087ce64dc631552f&amp;type=3#PanelStyles" />
+  <ui:Box name="resource-panel" class="panel resource-panel">
+    <ui:Label name="gold-label" text="Gold: 1000" class="resource-text" />
+  </ui:Box>
+</ui:UXML>
