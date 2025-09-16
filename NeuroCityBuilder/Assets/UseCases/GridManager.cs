@@ -11,6 +11,9 @@ namespace UseCases
 
         private bool[,] _occupiedCells;
 
+        public int GridWidth => this._width;
+        public int GridHeight => this._height;
+
         private void Awake()
         {
             this._occupiedCells = new bool[this._width, this._height];
