@@ -8,5 +8,7 @@ namespace UseCases.Services
         void RemoveBuilding(GridPos position);
         Building MoveBuilding(GridPos startPos, GridPos endPos);
         Building UpgradeBuilding(GridPos position);
+        Building GetBuildingAt(GridPos position);
+        void SelectBuilding(Building building);
     }
 }

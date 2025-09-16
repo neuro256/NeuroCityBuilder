@@ -8,13 +8,13 @@ namespace Presentation.UI
         [Header("Grid Settings")]
         [SerializeField] private int _width = 32;
         [SerializeField] private int _height = 32;
+        [SerializeField] private Transform _parent;
 
         [Header("Prefabs")]
         [SerializeField] private GridCell _gridCellPrefab;
 
         private GridCell[,] _gridCells;
         private GridCell _currentHighlightedCell;
-        private float _offsetX;
 
         private void Start()
         {
@@ -25,14 +25,12 @@ namespace Presentation.UI
         {
             this._gridCells = new GridCell[this._width, this._height];
 
-            this._offsetX = -(this._width) / 2f;
-
             for (int x = 0; x < this._width; x++)
             {
                 for (int y = 0; y < this._height; y++)
                 {
-                    Vector3 position = new Vector3(x + this._offsetX, 0.01f, y);
-                    GridCell cell = Instantiate(this._gridCellPrefab, position, Quaternion.Euler(90, 0, 0), this.transform);
+                    Vector3 position = new Vector3(x, 0.01f, y);// + this._parent.transform.position;
+                    GridCell cell = Instantiate(this._gridCellPrefab, position, Quaternion.Euler(90, 0, 0), this._parent);
                     cell.name = $"GridCell_{x}_{y}";
 
                     GridCell gridCell = cell.GetComponent<GridCell>();
@@ -82,13 +80,13 @@ namespace Presentation.UI
 
         public Vector3 GridToWorld(GridPos gridPos)
         {
-            return new Vector3(gridPos.X + this._offsetX, 0, gridPos.Y);
+            return new Vector3(gridPos.X, 0, gridPos.Y);
         }
 
         public GridPos WorldToGrid(Vector3 worldPosition)
         {
-            int x = Mathf.FloorToInt(worldPosition.x - this._offsetX);
-            int y = Mathf.FloorToInt(worldPosition.z);
+            int x = Mathf.RoundToInt(worldPosition.x);
+            int y = Mathf.RoundToInt(worldPosition.z);
             return new GridPos(x, y);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Domain.Gameplay;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace UseCases
@@ -10,6 +11,12 @@ namespace UseCases
         [SerializeField] private GameObject _minePrefab;
         [SerializeField] private Transform _buildingsParent;
 
+        private readonly Dictionary<GridPos, GameObject> _buildingInstances = new();
+
+        private void OnDestroy()
+        {
+            this.ClearAllBuildings();
+        }
 
         public Building CreateBuilding(BuildingType type, GridPos position)
         {
@@ -20,7 +27,7 @@ namespace UseCases
                 return null;
             }
 
-            Vector3 worldPosition = this.GridToWorld(position);
+            Vector3 worldPosition = new Vector3(position.X, 0.5f, position.Y);
             GameObject buildingGO = Object.Instantiate(prefab, worldPosition, Quaternion.identity, this._buildingsParent);
 
             Building building = new Building
@@ -30,7 +37,25 @@ namespace UseCases
                 CurrentLevel = 0
             };
 
+            this._buildingInstances[position] = buildingGO;
+
             return building;
+        }
+
+        public void RemoveBuildingVisual(GridPos position)
+        {
+            if (this._buildingInstances.TryGetValue(position, out GameObject buildingGO))
+            {
+                Destroy(buildingGO);
+                this._buildingInstances.Remove(position);
+                Debug.Log($"Building visual removed from {position.X},{position.Y}");
+            }
+        }
+
+        public GameObject GetBuildingVisual(GridPos position)
+        {
+            this._buildingInstances.TryGetValue(position, out GameObject buildingGO);
+            return buildingGO;
         }
 
         private GameObject GetPrefabByType(BuildingType type)
@@ -45,10 +70,14 @@ namespace UseCases
             };
         }
 
-        private Vector3 GridToWorld(GridPos gridPos)
+        public void ClearAllBuildings()
         {
-            float offsetX = -(32) / 2f; 
-            return new Vector3(gridPos.X + offsetX, 0.5f, gridPos.Y);
+            foreach (GameObject buildingGO in this._buildingInstances.Values)
+            {
+                if (buildingGO != null)
+                    Destroy(buildingGO);
+            }
+            this._buildingInstances.Clear();
         }
     }
 }

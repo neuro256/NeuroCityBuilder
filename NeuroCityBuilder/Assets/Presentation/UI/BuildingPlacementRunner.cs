@@ -5,10 +5,10 @@ namespace Presentation.UI
 {
     public class BuildingPlacementRunner : MonoBehaviour
     {
-        private BuildingPlacementSystem _placementSystem;
+        private BuildingInteractionSystem _placementSystem;
 
         [Inject]
-        public void Construct(BuildingPlacementSystem placementSystem)
+        public void Construct(BuildingInteractionSystem placementSystem)
         {
             this._placementSystem = placementSystem;
         }

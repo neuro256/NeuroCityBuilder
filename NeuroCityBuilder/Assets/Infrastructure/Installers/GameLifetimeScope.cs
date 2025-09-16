@@ -19,8 +19,9 @@ namespace Infrastructure.Installers
         protected override void Configure(IContainerBuilder builder)
         {
             MessagePipeOptions options = builder.RegisterMessagePipe();
-            builder.RegisterMessageBroker<BuildingSelectedMessage>(options);
+            builder.RegisterMessageBroker<BuildingTypeSelectedMessage>(options);
             builder.RegisterMessageBroker<BuildingPlacedMessage>(options);
+            builder.RegisterMessageBroker<BuildingDeletedMessage>(options);
 
             //Сервисы
             builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
@@ -32,12 +33,14 @@ namespace Infrastructure.Installers
             builder.RegisterComponentInHierarchy<GridManager>().AsSelf();
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildPanelView>().AsSelf();
+            builder.RegisterComponentInHierarchy<BuildingActionPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingPlacementRunner>().AsSelf();
 
             //Презентеры и системы
             builder.Register<BuildPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<BuildingPlacementSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
+            builder.Register<BuildingActionPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<BuildingInteractionSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
 
             //Input
             builder.Register(resolver =>

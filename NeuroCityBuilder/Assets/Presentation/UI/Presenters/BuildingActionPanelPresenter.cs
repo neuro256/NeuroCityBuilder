@@ -1,11 +1,16 @@
-﻿using Presentation.UI.Views;
+﻿using Domain.Gameplay;
+using Presentation.UI.Views;
 using System;
 using UnityEngine;
+using UseCases.Services;
 
 namespace Presentation.UI.Presenters
 {
     public class BuildingActionPanelPresenter : PanelPresenterBase<BuildingActionPanelView>
     {
+        private readonly IBuildingService _buildingService;
+        private Building _selectedBuilding;
+
         public BuildingActionPanelPresenter(BuildingActionPanelView view) : base(view) { }  
 
         public override void Initialize()
@@ -19,7 +24,7 @@ namespace Presentation.UI.Presenters
 
         private void HandleDeleteClicked()
         {
-            throw new NotImplementedException();
+            
         }
 
         private void HandleUpgradeClicked()
