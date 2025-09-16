@@ -5,7 +5,7 @@ namespace UseCases.Services
 {
     public interface IBuildingService
     {
-        Building PlaceBuilding(BuildingType type, GridPos position);
+        Building PlaceBuilding(BuildingType type, GridPos position, bool isNewBuilding = false);
         void RemoveBuilding(GridPos position);
         Building MoveBuilding(GridPos startPos, GridPos endPos);
         Building UpgradeBuilding(GridPos position);

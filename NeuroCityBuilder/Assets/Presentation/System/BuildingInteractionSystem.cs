@@ -88,7 +88,7 @@ namespace Presentation.System
 
         private void PlaceBuildingAt(GridPos position)
         {
-            Building building = this._buildingService.PlaceBuilding(this._selectedBuildingType, position);
+            Building building = this._buildingService.PlaceBuilding(this._selectedBuildingType, position, true);
             if (building != null)
             {
                 this._gridView.HideHighlight();

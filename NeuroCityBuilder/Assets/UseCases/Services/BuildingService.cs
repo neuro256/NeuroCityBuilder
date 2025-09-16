@@ -81,7 +81,7 @@ namespace UseCases.Services
             return building;
         }
 
-        public Building PlaceBuilding(BuildingType type, GridPos position)
+        public Building PlaceBuilding(BuildingType type, GridPos position, bool isNewBuilding = false)
         {
             Debug.Log($"PlaceBuilding type: {type} pos: {position}");
 
@@ -93,14 +93,15 @@ namespace UseCases.Services
 
             int buildingCost = this.GetBuildingCost(this._buildingFactory.GetBuildingLevels(type), 0);
 
-            if (!this._resourceService.CanAfford(buildingCost))
+            if (!this._resourceService.CanAfford(buildingCost) && isNewBuilding)
             {
                 return null;
             }
 
             Building building = this._buildingFactory.CreateBuilding(type, position);
-            this._resourceService.SpendGold(buildingCost);
             this._gridManager.SetCellOccupied(position, true);
+
+            if (isNewBuilding) this._resourceService.SpendGold(buildingCost);
 
             this._buildingPlacedPublisher.Publish(new BuildingPlacedMessage
             {
