@@ -22,6 +22,11 @@ namespace Domain.Messages
     public struct BuildingPlacementCanceledMessage { }
     public struct BuildingDeselectedMessage { }
 
+    public struct BuildingDeleteRequestMessage 
+    {
+        public Building Building;
+    }
+
     public struct BuildingDeletedMessage
     {
         public Building Building;

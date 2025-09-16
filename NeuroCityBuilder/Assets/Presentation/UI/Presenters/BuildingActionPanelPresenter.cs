@@ -12,15 +12,19 @@ namespace Presentation.UI.Presenters
     {
         private readonly ISubscriber<BuildingSelectedMessage> _buildingSelectedSubscriber;
         private readonly ISubscriber<BuildingDeselectedMessage> _buildingDeselectedSubscriber;
+        private readonly IPublisher<BuildingDeleteRequestMessage> _buildingDeleteRequestPublisher;
+
         private Building _selectedBuilding;
         private IDisposable _subscription;
 
         public BuildingActionPanelPresenter(BuildingActionPanelView view, 
             ISubscriber<BuildingSelectedMessage> buildingSelectedSubscriber,
-            ISubscriber<BuildingDeselectedMessage> buildingDeselectedSubscriber) : base(view) 
+            ISubscriber<BuildingDeselectedMessage> buildingDeselectedSubscriber,
+            IPublisher<BuildingDeleteRequestMessage> buildingDeleteRequestPublisher) : base(view) 
         {
             this._buildingSelectedSubscriber = buildingSelectedSubscriber;
             this._buildingDeselectedSubscriber = buildingDeselectedSubscriber;
+            this._buildingDeleteRequestPublisher = buildingDeleteRequestPublisher;
         }  
 
         public override void Initialize()
@@ -33,8 +37,6 @@ namespace Presentation.UI.Presenters
             this._buildingSelectedSubscriber.Subscribe(this.OnBuildingSelected).AddTo(bag);
             this._buildingDeselectedSubscriber.Subscribe(this.OnBuildingDeselected).AddTo(bag);
             this._subscription = bag.Build();
-
-            this.view.HidePanel();
         }
 
         private void OnBuildingSelected(BuildingSelectedMessage message)
@@ -53,7 +55,17 @@ namespace Presentation.UI.Presenters
 
         private void HandleDeleteClicked()
         {
-            
+            Debug.Log("BuildingActionPanelPresenter: HandleDeleteClicked");
+
+            if (this._selectedBuilding != null)
+            {
+                this._buildingDeleteRequestPublisher.Publish(new BuildingDeleteRequestMessage
+                {
+                    Building = this._selectedBuilding
+                });
+            }
+
+            this.view.HidePanel();
         }
 
         private void HandleUpgradeClicked()
