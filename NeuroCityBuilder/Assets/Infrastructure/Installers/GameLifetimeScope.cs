@@ -31,13 +31,14 @@ namespace Infrastructure.Installers
             builder.RegisterMessageBroker<BuildingMoveStartMessage>(options);
             builder.RegisterMessageBroker<BuildingMoveCompleteMessage>(options);
             builder.RegisterMessageBroker<BuildingMoveCancelMessage>(options);
+            builder.RegisterMessageBroker<GoldAddedMessage>(options);   
 
             //Сервисы
             builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
+            builder.Register<IResourceService, ResourceService>(Lifetime.Singleton);
 
             //Компоненты сцены
             //builder.RegisterComponentInHierarchy<SaveLoadPanelView>().AsSelf();
-            //builder.Register<SaveLoadPanelPresenter>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<BuildingFactory>().AsSelf();
             builder.RegisterComponentInHierarchy<GridManager>().AsSelf();
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
@@ -46,6 +47,7 @@ namespace Infrastructure.Installers
             builder.RegisterComponentInHierarchy<BuildingInfoPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingSystemsRunner>().AsSelf();
+            builder.RegisterComponentInHierarchy<ResourcePanelView>().AsSelf();
 
             //Презентеры и системы
             builder.Register<BuildPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
@@ -53,6 +55,7 @@ namespace Infrastructure.Installers
             builder.Register<BuildingInteractionSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
             builder.Register<BuildingInfoPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<BuildingMoveSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
+            builder.Register<ResourcePanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
 
             //Input
             builder.Register(resolver =>

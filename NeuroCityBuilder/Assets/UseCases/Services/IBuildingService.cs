@@ -1,4 +1,5 @@
 ﻿using Domain.Gameplay;
+using System.Collections.Generic;
 
 namespace UseCases.Services
 {
@@ -11,5 +12,6 @@ namespace UseCases.Services
         Building GetBuildingAt(GridPos position);
         void SelectBuilding(Building building);
         void DeselectBuilding();
+        List<Building> GetAllBuildings();
     }
 }
