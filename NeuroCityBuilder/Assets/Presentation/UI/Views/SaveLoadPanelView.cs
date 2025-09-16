@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Presentation.UI.Views
 {
-    public class SaveLoadPanelView : PanelViewBase
+    public class SaveLoadPanelView : PanelViewBase, ISaveLoadPanelView
     {
         public event Action onSaveClicked;
         public event Action onLoadClicked;
@@ -23,12 +23,6 @@ namespace Presentation.UI.Views
             this._loadButton.clicked += () => onLoadClicked?.Invoke();
         }
 
-        public void OnSaveClicked()
-        {
-            onSaveClicked?.Invoke();
-            Debug.Log("On Save Clicked");
-        }
-
         public void EnableSaveButton(bool value)
         {
             this._saveButton.SetEnabled(value);
@@ -37,6 +31,12 @@ namespace Presentation.UI.Views
         public void EnableLoadButton(bool value)
         {
             this._loadButton.SetEnabled(value);
+        }
+
+        private void OnSaveClicked()
+        {
+            onSaveClicked?.Invoke();
+            Debug.Log("On Save Clicked");
         }
     }
 }

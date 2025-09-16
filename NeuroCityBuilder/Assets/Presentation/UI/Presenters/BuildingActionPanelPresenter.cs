@@ -8,7 +8,7 @@ using UseCases.Services;
 
 namespace Presentation.UI.Presenters
 {
-    public class BuildingActionPanelPresenter : PanelPresenterBase<BuildingActionPanelView>
+    public class BuildingActionPanelPresenter : PanelPresenterBase<IBuildingActionPanelView>
     {
         private readonly ISubscriber<BuildingSelectedMessage> _buildingSelectedSubscriber;
         private readonly ISubscriber<BuildingDeselectedMessage> _buildingDeselectedSubscriber;
@@ -19,7 +19,7 @@ namespace Presentation.UI.Presenters
         private Building _selectedBuilding;
         private IDisposable _subscription;
 
-        public BuildingActionPanelPresenter(BuildingActionPanelView view, 
+        public BuildingActionPanelPresenter(IBuildingActionPanelView view, 
             ISubscriber<BuildingSelectedMessage> buildingSelectedSubscriber,
             ISubscriber<BuildingDeselectedMessage> buildingDeselectedSubscriber,
             IPublisher<BuildingDeleteRequestMessage> buildingDeleteRequestPublisher,

@@ -42,12 +42,12 @@ namespace Infrastructure.Installers
             builder.RegisterComponentInHierarchy<BuildingFactory>().AsSelf();
             builder.RegisterComponentInHierarchy<GridManager>().AsSelf();
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
-            builder.RegisterComponentInHierarchy<BuildPanelView>().AsSelf();
-            builder.RegisterComponentInHierarchy<BuildingActionPanelView>().AsSelf();
-            builder.RegisterComponentInHierarchy<BuildingInfoPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingSystemsRunner>().AsSelf();
-            builder.RegisterComponentInHierarchy<ResourcePanelView>().AsSelf();
+            builder.RegisterComponentInHierarchy<BuildPanelView>().As<IBuildPanelView>();
+            builder.RegisterComponentInHierarchy<BuildingActionPanelView>().As<IBuildingActionPanelView>();
+            builder.RegisterComponentInHierarchy<BuildingInfoPanelView>().As<IBuildingInfoPanelView>();
+            builder.RegisterComponentInHierarchy<ResourcePanelView>().As<IResourcePanelView>();
 
             //Презентеры и системы
             builder.Register<BuildPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();

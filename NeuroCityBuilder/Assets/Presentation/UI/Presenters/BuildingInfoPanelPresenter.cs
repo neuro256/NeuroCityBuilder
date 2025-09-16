@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Presentation.UI.Presenters
 {
-    public class BuildingInfoPanelPresenter : PanelPresenterBase<BuildingInfoPanelView>
+    public class BuildingInfoPanelPresenter : PanelPresenterBase<IBuildingInfoPanelView>
     {
         private readonly ISubscriber<BuildingSelectedMessage> _buildingSelectedSubscriber;
         private readonly ISubscriber<BuildingDeselectedMessage> _buildingDeselectedSubscriber;
@@ -16,7 +16,7 @@ namespace Presentation.UI.Presenters
 
         private IDisposable _subscription;
 
-        public BuildingInfoPanelPresenter(BuildingInfoPanelView view,
+        public BuildingInfoPanelPresenter(IBuildingInfoPanelView view,
             ISubscriber<BuildingSelectedMessage> buildingSelectedSubscriber,
             ISubscriber<BuildingDeselectedMessage> buildingDeselectedSubscriber,
             ISubscriber<BuildingDeletedMessage> buildingDeletedSubscriber,

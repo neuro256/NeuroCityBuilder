@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 namespace Presentation.UI.Views
 {
     [RequireComponent(typeof(UIDocument))]
-    public abstract class PanelViewBase : MonoBehaviour
+    public abstract class PanelViewBase : MonoBehaviour, IPanelView
     {
         protected VisualElement root;
         protected UIDocument uiDocument;

@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace Presentation.UI.Presenters
 {
-    public class BuildPanelPresenter : PanelPresenterBase<BuildPanelView>
+    public class BuildPanelPresenter : PanelPresenterBase<IBuildPanelView>
     {
         private readonly IPublisher<BuildingTypeSelectedMessage> _buildingSelectedPublisher;
 
-        public BuildPanelPresenter(BuildPanelView view, IPublisher<BuildingTypeSelectedMessage> buildingSelectedPublisher) : base(view)
+        public BuildPanelPresenter(IBuildPanelView view, IPublisher<BuildingTypeSelectedMessage> buildingSelectedPublisher) : base(view)
         {
             this._buildingSelectedPublisher = buildingSelectedPublisher;
         }

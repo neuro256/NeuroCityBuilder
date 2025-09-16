@@ -6,13 +6,13 @@ using UseCases.Services;
 
 namespace Presentation.UI.Presenters
 {
-    public class ResourcePanelPresenter : PanelPresenterBase<ResourcePanelView>
+    public class ResourcePanelPresenter : PanelPresenterBase<IResourcePanelView>
     {
         private readonly IResourceService _resourceService;
         private readonly ISubscriber<GoldAddedMessage> _goldAddedSubscriber;
         private IDisposable _subscription;
 
-        public ResourcePanelPresenter(ResourcePanelView view, 
+        public ResourcePanelPresenter(IResourcePanelView view, 
             IResourceService resourceService, 
             ISubscriber<GoldAddedMessage> goldAddedSubscriber) : base(view) 
         { 
