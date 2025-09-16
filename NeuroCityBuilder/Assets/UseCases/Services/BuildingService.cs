@@ -204,6 +204,11 @@ namespace UseCases.Services
             this._moveSubscription?.Dispose();
             this._buildings.Clear();
         }
+
+        public List<Building> GetAllBuildings()
+        {
+            return this._buildings.Values.ToList();
+        }
     }
 }
 

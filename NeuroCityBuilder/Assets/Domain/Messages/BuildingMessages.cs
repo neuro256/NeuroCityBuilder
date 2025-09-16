@@ -63,5 +63,11 @@ namespace Domain.Messages
     {
         public Building Building;
     }
+
+    public struct GoldAddedMessage
+    {
+        public int Amount;
+        public int Total;
+    }
 }
 
