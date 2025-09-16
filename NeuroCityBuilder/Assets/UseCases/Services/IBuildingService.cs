@@ -10,5 +10,6 @@ namespace UseCases.Services
         Building UpgradeBuilding(GridPos position);
         Building GetBuildingAt(GridPos position);
         void SelectBuilding(Building building);
+        void DeselectBuilding();
     }
 }

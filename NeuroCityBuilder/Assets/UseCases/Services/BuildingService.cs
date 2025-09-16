@@ -15,6 +15,7 @@ namespace UseCases.Services
         private readonly IPublisher<BuildingPlacedMessage> _buildingPlacedPublisher;
         private readonly IPublisher<BuildingDeletedMessage> _buildingDeletedPublisher;
         private readonly IPublisher<BuildingSelectedMessage> _buildingSelectedPublisher;
+        private readonly IPublisher<BuildingDeselectedMessage> _buildingDeselectedPublisher;
 
         private readonly Dictionary<GridPos, Building> _buildings = new();
         private Building _selectedBuilding;
@@ -24,12 +25,14 @@ namespace UseCases.Services
         IPublisher<BuildingPlacedMessage> buildingPlacedPublisher,
         IPublisher<BuildingDeletedMessage> buildingDeletedPublisher,
         IPublisher<BuildingSelectedMessage> buildingSelectedPublisher,
+        IPublisher<BuildingDeselectedMessage> buildingDeselectPublisher,
         BuildingFactory buildingFactory)
         {
             this._gridManager = gridManager;
             this._buildingPlacedPublisher = buildingPlacedPublisher;
             this._buildingDeletedPublisher = buildingDeletedPublisher;
             this._buildingSelectedPublisher = buildingSelectedPublisher;
+            this._buildingDeselectedPublisher = buildingDeselectPublisher;
             this._buildingFactory = buildingFactory;
         }
 
@@ -149,6 +152,13 @@ namespace UseCases.Services
             Debug.Log($"GetBuildingAt: pos={position.X}:{position.Y}");
             this._buildings.TryGetValue(position, out Building building);
             return building;
+        }
+
+        public void DeselectBuilding()
+        {
+            this._selectedBuilding = null;
+
+            this._buildingDeselectedPublisher.Publish(new BuildingDeselectedMessage());
         }
     }
 }

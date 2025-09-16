@@ -22,6 +22,7 @@ namespace Infrastructure.Installers
             builder.RegisterMessageBroker<BuildingTypeSelectedMessage>(options);
             builder.RegisterMessageBroker<BuildingPlacedMessage>(options);
             builder.RegisterMessageBroker<BuildingDeletedMessage>(options);
+            builder.RegisterMessageBroker<BuildingDeselectedMessage>(options);
 
             //Сервисы
             builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
