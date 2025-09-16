@@ -32,5 +32,15 @@ namespace Domain.Messages
         public Building Building;
         public GridPos Position;
     }
+
+    public struct BuildingUpgradedMessage
+    {
+        public Building Building;
+    }
+
+    public struct BuildingUpgradeRequestMessage
+    {
+        public Building Building;
+    }
 }
 

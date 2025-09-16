@@ -13,6 +13,7 @@ namespace Presentation.UI.Presenters
         private readonly ISubscriber<BuildingSelectedMessage> _buildingSelectedSubscriber;
         private readonly ISubscriber<BuildingDeselectedMessage> _buildingDeselectedSubscriber;
         private readonly IPublisher<BuildingDeleteRequestMessage> _buildingDeleteRequestPublisher;
+        private readonly IPublisher<BuildingUpgradeRequestMessage> _buildingUpgradeRequestPublisher;
 
         private Building _selectedBuilding;
         private IDisposable _subscription;
@@ -20,11 +21,13 @@ namespace Presentation.UI.Presenters
         public BuildingActionPanelPresenter(BuildingActionPanelView view, 
             ISubscriber<BuildingSelectedMessage> buildingSelectedSubscriber,
             ISubscriber<BuildingDeselectedMessage> buildingDeselectedSubscriber,
-            IPublisher<BuildingDeleteRequestMessage> buildingDeleteRequestPublisher) : base(view) 
+            IPublisher<BuildingDeleteRequestMessage> buildingDeleteRequestPublisher,
+            IPublisher<BuildingUpgradeRequestMessage> buildingUpgradeRequestPublisher) : base(view) 
         {
             this._buildingSelectedSubscriber = buildingSelectedSubscriber;
             this._buildingDeselectedSubscriber = buildingDeselectedSubscriber;
             this._buildingDeleteRequestPublisher = buildingDeleteRequestPublisher;
+            this._buildingUpgradeRequestPublisher = buildingUpgradeRequestPublisher;
         }  
 
         public override void Initialize()
@@ -44,6 +47,7 @@ namespace Presentation.UI.Presenters
             Debug.Log($"BuildingActionPanelPresenter: Building selected - {message.Building.Type}");
             this._selectedBuilding = message.Building;
             this.view.ShowPanel();
+            this.UpdateUpgradeButtonState(message.Building);
         }
 
         private void OnBuildingDeselected(BuildingDeselectedMessage message)
@@ -70,12 +74,44 @@ namespace Presentation.UI.Presenters
 
         private void HandleUpgradeClicked()
         {
-            throw new NotImplementedException();
+            Debug.Log("BuildingActionPanelPresenter: HandleUpgradeClicked");
+
+            if (this._selectedBuilding != null)
+            {
+                // Проверяем, можно ли улучшить здание
+                if (this._selectedBuilding.CurrentLevel < this._selectedBuilding.Levels.Length - 1)
+                {
+                    Debug.Log($"Sending upgrade request for building {this._selectedBuilding.Type}");
+
+                    this._buildingUpgradeRequestPublisher.Publish(new BuildingUpgradeRequestMessage
+                    {
+                        Building = this._selectedBuilding
+                    });
+                }
+                else
+                {
+                    Debug.Log("Building is already at max level");
+                    this.view.EnableUpgradeButton(false);
+                }
+            }
         }
 
         private void HandleMoveClicked()
         {
             throw new NotImplementedException();
+        }
+
+        private void UpdateUpgradeButtonState(Building building)
+        {
+            if (building != null)
+            {
+                bool canUpgrade = building.CurrentLevel < building.Levels.Length - 1;
+                this.view.EnableUpgradeButton(canUpgrade);
+            }
+            else
+            {
+                this.view.EnableUpgradeButton(false);
+            }
         }
 
         public override void Dispose()

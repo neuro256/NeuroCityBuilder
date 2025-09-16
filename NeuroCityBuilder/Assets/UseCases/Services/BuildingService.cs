@@ -18,10 +18,13 @@ namespace UseCases.Services
         private readonly IPublisher<BuildingSelectedMessage> _buildingSelectedPublisher;
         private readonly IPublisher<BuildingDeselectedMessage> _buildingDeselectedPublisher;
         private readonly ISubscriber<BuildingDeleteRequestMessage> _buildingDeleteRequestSubscriber;
+        private readonly IPublisher<BuildingUpgradedMessage> _buildingUpgradedPublisher;
+        private readonly ISubscriber<BuildingUpgradeRequestMessage> _buildingUpgradeRequestSubscriber;
 
         private readonly Dictionary<GridPos, Building> _buildings = new();
         private Building _selectedBuilding;
         private IDisposable _deleteSubscription;
+        private IDisposable _upgradeSubscription;
 
         public BuildingService(
         GridManager gridManager,
@@ -30,6 +33,8 @@ namespace UseCases.Services
         IPublisher<BuildingSelectedMessage> buildingSelectedPublisher,
         IPublisher<BuildingDeselectedMessage> buildingDeselectPublisher,
         ISubscriber<BuildingDeleteRequestMessage> buildingDeleteRequestSubscriber,
+        IPublisher<BuildingUpgradedMessage> buildingUpgradedPublisher,
+        ISubscriber<BuildingUpgradeRequestMessage> buildingUpgradeRequestSubscriber,
         BuildingFactory buildingFactory)
         {
             this._gridManager = gridManager;
@@ -38,9 +43,12 @@ namespace UseCases.Services
             this._buildingSelectedPublisher = buildingSelectedPublisher;
             this._buildingDeselectedPublisher = buildingDeselectPublisher;
             this._buildingDeleteRequestSubscriber = buildingDeleteRequestSubscriber;
+            this._buildingUpgradedPublisher = buildingUpgradedPublisher;
+            this._buildingUpgradeRequestSubscriber = buildingUpgradeRequestSubscriber;
             this._buildingFactory = buildingFactory;
 
             this._deleteSubscription = this._buildingDeleteRequestSubscriber.Subscribe(this.HandleDeleteRequest);
+            this._upgradeSubscription = this._buildingUpgradeRequestSubscriber.Subscribe(this.HandleUpgradeRequest);
         }
 
         public Building MoveBuilding(GridPos startPos, GridPos endPos)
@@ -123,7 +131,19 @@ namespace UseCases.Services
                 if (building.CurrentLevel < building.Levels.Length - 1)
                 {
                     building.CurrentLevel++;
+
+                    // Публикуем сообщение об улучшении
+                    this._buildingUpgradedPublisher.Publish(new BuildingUpgradedMessage
+                    {
+                        Building = building
+                    });
+
+                    Debug.Log($"Building upgraded to level {building.CurrentLevel + 1}");
                     return building;
+                }
+                else
+                {
+                    Debug.Log("Building is already at max level");
                 }
             }
             return null;
@@ -158,6 +178,12 @@ namespace UseCases.Services
         {
             Debug.Log($"HandleDeleteRequest: type={message.Building.Type} pos={message.Building.Position.X}:{message.Building.Position.Y}");
             this.RemoveBuilding(message.Building.Position);
+        }
+
+        private void HandleUpgradeRequest(BuildingUpgradeRequestMessage message)
+        {
+            Debug.Log($"BuildingService: Upgrade request received for building {message.Building.Type} at {message.Building.Position.X},{message.Building.Position.Y}");
+            this.UpgradeBuilding(message.Building.Position);
         }
 
         public void Dispose()
