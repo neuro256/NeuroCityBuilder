@@ -3,15 +3,14 @@ using UnityEngine;
 
 namespace Domain.Messages
 {
-    public struct BuildingSelectedMessage
+    public struct BuildingTypeSelectedMessage
     {
         public BuildingType BuildingType;
     }
 
-    public struct BuildingPlacementRequestMessage
+    public struct BuildingSelectedMessage
     {
-        public BuildingType BuildingType;
-        public GridPos Position;
+        public Building Building;
     }
 
     public struct BuildingPlacedMessage
@@ -21,5 +20,12 @@ namespace Domain.Messages
     }
 
     public struct BuildingPlacementCanceledMessage { }
+    public struct BuildingDeselectedMessage { }
+
+    public struct BuildingDeletedMessage
+    {
+        public Building Building;
+        public GridPos Position;
+    }
 }
 

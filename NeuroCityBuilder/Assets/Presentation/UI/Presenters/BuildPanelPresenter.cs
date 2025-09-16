@@ -8,9 +8,9 @@ namespace Presentation.UI.Presenters
 {
     public class BuildPanelPresenter : PanelPresenterBase<BuildPanelView>
     {
-        private readonly IPublisher<BuildingSelectedMessage> _buildingSelectedPublisher;
+        private readonly IPublisher<BuildingTypeSelectedMessage> _buildingSelectedPublisher;
 
-        public BuildPanelPresenter(BuildPanelView view, IPublisher<BuildingSelectedMessage> buildingSelectedPublisher) : base(view)
+        public BuildPanelPresenter(BuildPanelView view, IPublisher<BuildingTypeSelectedMessage> buildingSelectedPublisher) : base(view)
         {
             this._buildingSelectedPublisher = buildingSelectedPublisher;
         }
@@ -24,7 +24,7 @@ namespace Presentation.UI.Presenters
         {
             Debug.Log($"HandleBuildingSelection: {buildingType}");
 
-            this._buildingSelectedPublisher.Publish(new BuildingSelectedMessage
+            this._buildingSelectedPublisher.Publish(new BuildingTypeSelectedMessage
             {
                 BuildingType = buildingType
             });
