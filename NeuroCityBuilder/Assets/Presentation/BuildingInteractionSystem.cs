@@ -112,7 +112,6 @@ namespace Presentation
         {
             if (this._isPlacingBuilding) return;
 
-            // Обработка выбора зданий кликом
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
                 Vector2 mousePosition = Mouse.current.position.ReadValue();
@@ -126,15 +125,14 @@ namespace Presentation
                     if (building != null)
                     {
                         Debug.Log("BUild clicked");
-                        // Выбираем здание через сервис
                         this._gridView.ShowHighlight(gridPos, true);
                         this._buildingService.SelectBuilding(building);
                     }
                     else
                     {
                         Debug.Log("BUild is null");
-                        // Скрываем подсветку если кликнули не по зданию
                         this._gridView.HideHighlight();
+                        this._buildingService.DeselectBuilding();
                         this._selectedBuilding = null;
                     }
                 }
