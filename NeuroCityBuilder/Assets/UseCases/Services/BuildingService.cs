@@ -22,6 +22,7 @@ namespace UseCases.Services
         private readonly ISubscriber<BuildingUpgradeRequestMessage> _buildingUpgradeRequestSubscriber;
         private readonly ISubscriber<BuildingMoveRequestMessage> _buildingMoveRequestSubscriber;
 
+        private readonly IResourceService _resourceService;
         private readonly Dictionary<GridPos, Building> _buildings = new();
         private Building _selectedBuilding;
         private IDisposable _deleteSubscription;
@@ -38,6 +39,7 @@ namespace UseCases.Services
         IPublisher<BuildingUpgradedMessage> buildingUpgradedPublisher,
         ISubscriber<BuildingUpgradeRequestMessage> buildingUpgradeRequestSubscriber,
         ISubscriber<BuildingMoveRequestMessage> buildingMoveRequestSubscriber,
+        IResourceService resourceService,
         BuildingFactory buildingFactory)
         {
             this._gridManager = gridManager;
@@ -50,6 +52,7 @@ namespace UseCases.Services
             this._buildingUpgradeRequestSubscriber = buildingUpgradeRequestSubscriber;
             this._buildingMoveRequestSubscriber = buildingMoveRequestSubscriber;
             this._buildingFactory = buildingFactory;
+            this._resourceService = resourceService;
 
             this._deleteSubscription = this._buildingDeleteRequestSubscriber.Subscribe(this.HandleDeleteRequest);
             this._upgradeSubscription = this._buildingUpgradeRequestSubscriber.Subscribe(this.HandleUpgradeRequest);
@@ -89,7 +92,14 @@ namespace UseCases.Services
             }
 
             Building building = this._buildingFactory.CreateBuilding(type, position);
+            int buildingCost = this.GetBuildingCost(building, 0);
 
+            if (!this._resourceService.CanAfford(buildingCost))
+            {
+                return null;
+            }
+
+            this._resourceService.SpendGold(buildingCost);
             this._gridManager.SetCellOccupied(position, true);
 
             this._buildingPlacedPublisher.Publish(new BuildingPlacedMessage
@@ -101,6 +111,13 @@ namespace UseCases.Services
             this._buildings[position] = building;
 
             return building;
+        }
+
+        private int GetBuildingCost(Building building, int level)
+        {
+            if (building == null || level > building.Levels.Length) return 0;
+
+            return building.Levels[level].Cost;
         }
 
         public void RemoveBuilding(GridPos position)
@@ -135,16 +152,24 @@ namespace UseCases.Services
             {
                 if (building.CurrentLevel < building.Levels.Length - 1)
                 {
-                    building.CurrentLevel++;
-
-                    // Публикуем сообщение об улучшении
-                    this._buildingUpgradedPublisher.Publish(new BuildingUpgradedMessage
+                    int nextLevelIndex = building.CurrentLevel + 1;
+                    if (nextLevelIndex < building.Levels.Length)
                     {
-                        Building = building
-                    });
+                        int upgradeCost = building.Levels[nextLevelIndex].Cost;
 
-                    Debug.Log($"Building upgraded to level {building.CurrentLevel + 1}");
-                    return building;
+                        if (this._resourceService.CanAfford(upgradeCost))
+                        {
+                            this._resourceService.SpendGold(upgradeCost);
+                            building.CurrentLevel++;
+
+                            this._buildingUpgradedPublisher.Publish(new BuildingUpgradedMessage
+                            {
+                                Building = building
+                            });
+
+                            return building;
+                        }
+                    }
                 }
                 else
                 {

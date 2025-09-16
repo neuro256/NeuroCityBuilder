@@ -3,8 +3,6 @@ using Domain.Gameplay;
 using Domain.Messages;
 using MessagePipe;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Threading;
 using UnityEngine;
 
@@ -18,14 +16,12 @@ namespace UseCases.Services
 
         public ResourceData Resources { get; private set; }
 
-        private readonly IBuildingService _buildingService;
-
         private CancellationTokenSource _cancellationTokenSource;
+        private IDisposable _subscription;
         private bool _isRunning;
 
-        public ResourceService(IBuildingService buildingService, IPublisher<GoldAddedMessage> goldAddedPublisher)
+        public ResourceService(IPublisher<GoldAddedMessage> goldAddedPublisher)
         {
-            this._buildingService = buildingService;
             this._goldAddedPublisher = goldAddedPublisher;
 
             this.Resources = new ResourceData()
@@ -53,6 +49,16 @@ namespace UseCases.Services
             Debug.Log("Income generation stopped");
         }
 
+        public bool CanAfford(int buildingCost)
+        {
+            return this.Resources.Gold >= buildingCost;
+        }
+
+        public void SpendGold(int amount)
+        {
+            this.ChangeGold(-amount);
+        }
+
         private async UniTaskVoid GenerateIncomeLoop(CancellationToken cancellationToken)
         {
             try
@@ -61,10 +67,10 @@ namespace UseCases.Services
                 {
                     await UniTask.Delay(TimeSpan.FromSeconds(_incomeDelay), cancellationToken: cancellationToken);
 
-                    int totalIncome = this.CalculateTotalIncome();
+                    int totalIncome = 10; //Для отладки, нашел баг
                     if (totalIncome > 0)
                     {
-                        this.AddGold(totalIncome);
+                        this.ChangeGold(totalIncome);
                         Debug.Log($"Income generated: +{totalIncome} gold");
                     }
                 }
@@ -79,32 +85,11 @@ namespace UseCases.Services
             }
         }
 
-        private int CalculateTotalIncome()
+        private void ChangeGold(int amount)
         {
-            List<Building> buildings = this._buildingService.GetAllBuildings();
-
-            if (buildings == null)
-                return 0;
-
-            int totalIncome = 0;
-
-            foreach (Building building in buildings)
-            {
-                BuildingLevel levelInfo = building?.GetCurrentLevelInfo();
-                if (levelInfo != null)
-                {
-                    totalIncome += levelInfo.Income;
-                }
-            }
-
-            return totalIncome;
-        }
-
-        private void AddGold(int amount)
-        {
-            if (amount <= 0) return;
-
             this.Resources.Gold += amount;
+            this.Resources.Gold = Math.Max(0, this.Resources.Gold);
+
             this._goldAddedPublisher.Publish(new GoldAddedMessage
             {
                 Amount = amount,

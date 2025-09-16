@@ -7,5 +7,7 @@ namespace UseCases.Services
     {
         ResourceData Resources { get; }
         void StartIncomeGeneration();
+        bool CanAfford(int buildingCost);
+        void SpendGold(int amount);
     }
 }
