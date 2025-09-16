@@ -5,9 +5,9 @@ using VContainer.Unity;
 
 namespace Presentation.UI.Presenters
 {
-    public class SaveLoadPanelPresenter : PanelPresenterBase<SaveLoadPanelView>
+    public class SaveLoadPanelPresenter : PanelPresenterBase<ISaveLoadPanelView>
     {
-        public SaveLoadPanelPresenter(SaveLoadPanelView view) : base(view) { }
+        public SaveLoadPanelPresenter(ISaveLoadPanelView view) : base(view) { }
 
         public override void Initialize()
         {

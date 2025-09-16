@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Presentation.UI.Views
 {
-    public class BuildingActionPanelView : PanelViewBase
+    public class BuildingActionPanelView : PanelViewBase, IBuildingActionPanelView
     {
         private Button _moveButton;
         private Button _upgradeButton;

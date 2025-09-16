@@ -5,7 +5,7 @@ using VContainer.Unity;
 
 namespace Presentation.UI.Presenters
 {
-    public abstract class PanelPresenterBase<TView> : IInitializable, IDisposable where TView : PanelViewBase
+    public abstract class PanelPresenterBase<TView> : IPanelPresenter where TView : IPanelView
     {
         protected TView view;
 

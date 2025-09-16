@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Presentation.UI.Views
 {
-    public class BuildingInfoPanelView : PanelViewBase
+    public class BuildingInfoPanelView : PanelViewBase, IBuildingInfoPanelView
     {
         private Label _levelLabel;
         private Label _incomeLabel;

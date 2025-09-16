@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Presentation.UI.Views
 {
-    public class ResourcePanelView : PanelViewBase
+    public class ResourcePanelView : PanelViewBase, IResourcePanelView
     {
         private Label _goldLabel;
 
