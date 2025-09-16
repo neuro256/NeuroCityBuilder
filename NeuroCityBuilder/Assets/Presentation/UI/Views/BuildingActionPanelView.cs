@@ -22,9 +22,36 @@ namespace Presentation.UI.Views
             this._upgradeButton = this.root.Q<Button>("upgrade-button");
             this._deleteButton = this.root.Q<Button>("delete-button");
 
-            this._moveButton.clicked += () => onMoveClicked?.Invoke();
-            this._upgradeButton.clicked += () => onUpgradeClicked?.Invoke();
-            this._deleteButton.clicked += () => onDeleteClicked?.Invoke();
+            this._moveButton.clicked += this.OnMoveButtonClicked;
+            this._upgradeButton.clicked += this.OnUpgradeButtonClicked;
+            this._deleteButton.clicked += this.OnDeleteButtonClicked;
+
+            this.HidePanel();
+        }
+
+        private void OnMoveButtonClicked()
+        {
+            onMoveClicked?.Invoke();
+        }
+
+        private void OnUpgradeButtonClicked()
+        {
+            onUpgradeClicked?.Invoke();
+        }
+
+        private void OnDeleteButtonClicked()
+        {
+            onDeleteClicked?.Invoke();
+        }
+
+        private void OnDestroy()
+        {
+            if (this._moveButton != null)
+                this._moveButton.clicked -= this.OnMoveButtonClicked;
+            if (this._upgradeButton != null)
+                this._upgradeButton.clicked -= this.OnUpgradeButtonClicked;
+            if (this._deleteButton != null)
+                this._deleteButton.clicked -= this.OnDeleteButtonClicked;
         }
 
         public void EnableMoveButton(bool enabled)
@@ -44,12 +71,12 @@ namespace Presentation.UI.Views
 
         public void ShowPanel()
         {
-            this.gameObject.SetActive(true);
+            this.root.style.display = DisplayStyle.Flex;
         }
 
         public void HidePanel()
         {
-            this.gameObject.SetActive(false);
+            this.root.style.display = DisplayStyle.None;
         }
     }
 }

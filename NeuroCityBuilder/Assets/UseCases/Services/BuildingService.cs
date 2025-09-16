@@ -1,6 +1,7 @@
 ﻿using Domain.Gameplay;
 using Domain.Messages;
 using MessagePipe;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,9 +17,11 @@ namespace UseCases.Services
         private readonly IPublisher<BuildingDeletedMessage> _buildingDeletedPublisher;
         private readonly IPublisher<BuildingSelectedMessage> _buildingSelectedPublisher;
         private readonly IPublisher<BuildingDeselectedMessage> _buildingDeselectedPublisher;
+        private readonly ISubscriber<BuildingDeleteRequestMessage> _buildingDeleteRequestSubscriber;
 
         private readonly Dictionary<GridPos, Building> _buildings = new();
         private Building _selectedBuilding;
+        private IDisposable _deleteSubscription;
 
         public BuildingService(
         GridManager gridManager,
@@ -26,6 +29,7 @@ namespace UseCases.Services
         IPublisher<BuildingDeletedMessage> buildingDeletedPublisher,
         IPublisher<BuildingSelectedMessage> buildingSelectedPublisher,
         IPublisher<BuildingDeselectedMessage> buildingDeselectPublisher,
+        ISubscriber<BuildingDeleteRequestMessage> buildingDeleteRequestSubscriber,
         BuildingFactory buildingFactory)
         {
             this._gridManager = gridManager;
@@ -33,7 +37,10 @@ namespace UseCases.Services
             this._buildingDeletedPublisher = buildingDeletedPublisher;
             this._buildingSelectedPublisher = buildingSelectedPublisher;
             this._buildingDeselectedPublisher = buildingDeselectPublisher;
+            this._buildingDeleteRequestSubscriber = buildingDeleteRequestSubscriber;
             this._buildingFactory = buildingFactory;
+
+            this._deleteSubscription = this._buildingDeleteRequestSubscriber.Subscribe(this.HandleDeleteRequest);
         }
 
         public Building MoveBuilding(GridPos startPos, GridPos endPos)
@@ -87,29 +94,15 @@ namespace UseCases.Services
         {
             if (this._buildings.TryGetValue(position, out Building building))
             {
-                // Сохраняем данные для сообщения перед удалением
                 Building deletedBuilding = building;
                 GridPos deletedPosition = position;
 
-                // Освобождаем клетку
                 this._gridManager.SetCellOccupied(position, false);
-
-                // Удаляем визуальное представление
                 this._buildingFactory.RemoveBuildingVisual(position);
-
-                // Удаляем здание из хранилища
                 this._buildings.Remove(position);
-
-                // Публикуем сообщение об удалении
-                this._buildingDeletedPublisher.Publish(new BuildingDeletedMessage
-                {
-                    Building = deletedBuilding,
-                    Position = deletedPosition
-                });
 
                 Debug.Log($"Building removed from position {position.X},{position.Y}");
 
-                // Если удаляем выбранное здание, сбрасываем выбор
                 if (this._selectedBuilding != null && this._selectedBuilding.Position.Equals(position))
                 {
                     this._selectedBuilding = null;
@@ -117,8 +110,8 @@ namespace UseCases.Services
 
                 this._buildingDeletedPublisher.Publish(new BuildingDeletedMessage
                 {
-                    Building = building,
-                    Position = position
+                    Building = deletedBuilding,
+                    Position = deletedPosition
                 });
             }
         }
@@ -159,6 +152,17 @@ namespace UseCases.Services
             this._selectedBuilding = null;
 
             this._buildingDeselectedPublisher.Publish(new BuildingDeselectedMessage());
+        }
+
+        private void HandleDeleteRequest(BuildingDeleteRequestMessage message)
+        {
+            Debug.Log($"HandleDeleteRequest: type={message.Building.Type} pos={message.Building.Position.X}:{message.Building.Position.Y}");
+            this.RemoveBuilding(message.Building.Position);
+        }
+
+        public void Dispose()
+        {
+            this._deleteSubscription?.Dispose();
         }
     }
 }
