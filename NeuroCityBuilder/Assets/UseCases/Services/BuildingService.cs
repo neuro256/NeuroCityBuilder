@@ -91,14 +91,14 @@ namespace UseCases.Services
                 return null;
             }
 
-            Building building = this._buildingFactory.CreateBuilding(type, position);
-            int buildingCost = this.GetBuildingCost(building, 0);
+            int buildingCost = this.GetBuildingCost(this._buildingFactory.GetBuildingLevels(type), 0);
 
             if (!this._resourceService.CanAfford(buildingCost))
             {
                 return null;
             }
 
+            Building building = this._buildingFactory.CreateBuilding(type, position);
             this._resourceService.SpendGold(buildingCost);
             this._gridManager.SetCellOccupied(position, true);
 
@@ -113,11 +113,11 @@ namespace UseCases.Services
             return building;
         }
 
-        private int GetBuildingCost(Building building, int level)
+        private int GetBuildingCost(BuildingLevel[] levels, int level)
         {
-            if (building == null || level > building.Levels.Length) return 0;
+            if (levels == null || level > levels.Length) return 0;
 
-            return building.Levels[level].Cost;
+            return levels[level].Cost;
         }
 
         public void RemoveBuilding(GridPos position)
@@ -192,8 +192,8 @@ namespace UseCases.Services
 
         public Building GetBuildingAt(GridPos position)
         {
-            Debug.Log($"GetBuildingAt: pos={position.X}:{position.Y}");
             this._buildings.TryGetValue(position, out Building building);
+            Debug.Log($"GetBuildingAt: pos={position.X}:{position.Y} result={building != null} ");
             return building;
         }
 

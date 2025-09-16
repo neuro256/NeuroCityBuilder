@@ -91,9 +91,10 @@ namespace Presentation.System
             Building building = this._buildingService.PlaceBuilding(this._selectedBuildingType, position);
             if (building != null)
             {
-                this._isPlacingBuilding = false;
                 this._gridView.HideHighlight();
             }
+
+            this.CancelPlacement();
         }
 
         private void CancelPlacement()
