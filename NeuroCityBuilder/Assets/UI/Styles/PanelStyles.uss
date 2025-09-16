@@ -1,152 +1,104 @@
 /* Основные стили панелей */
 .panel {
     background-color: rgba(30, 30, 40, 0.9);
-    border: 1px solid rgba(100, 150, 255, 0.3);
-    border-radius: 4px;
     padding: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    flex-direction: row;
+    align-items: center;
 }
 
-/* Панель ресурсов */
+/* Панель ресурсов - сверху слева */
 .resource-panel {
     position: absolute;
-    top: 20px;
     left: 20px;
+    top: 20px;
     width: 150px;
     height: 40px;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
 }
 
-.resource-text {
+.resource-panel Label {
     color: gold;
     font-size: 16px;
-    font-weight: bold;
+    unity-font-style: bold;
+    flex: 1;
     text-align: center;
 }
 
-/* Панель информации о здании */
+/* Панель информации о здании - сверху посередине */
 .building-info-panel {
     position: absolute;
-    top: 20px;
     left: 50%;
-    transform: translateX(-50%);
+    top: 20px;
     width: 200px;
     height: 60px;
+    margin-left: -100px; /* Половина ширины для центрирования */
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
 }
 
-.info-text {
+.building-info-panel Label {
     color: white;
     font-size: 14px;
+    flex: 1;
     text-align: center;
-    margin: 2px 0;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
-/* Панель сохранения/загрузки */
+/* Панель сохранения/загрузки - сверху справа */
 .save-load-panel {
     position: absolute;
-    top: 20px;
     right: 20px;
+    top: 20px;
     width: 150px;
     height: 40px;
-    flex-direction: row;
-    align-items: center;
     justify-content: space-between;
 }
 
-/* Панель постройки */
+/* Панель постройки - снизу слева */
 .build-panel {
     position: absolute;
-    bottom: 20px;
     left: 20px;
+    bottom: 20px;
     width: 250px;
     height: 50px;
-    flex-direction: row;
-    align-items: center;
     justify-content: space-between;
+}
+
+/* Панель действий со зданием - снизу справа */
+.building-action-panel {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    width: 250px;
+    height: 50px;
+    justify-content: space-between;
+}
+
+/* Общие стили для кнопок */
+Button {
+    width: 70px;
+    height: 40px;
+    font-size: 12px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Специфичные стили кнопок */
+.delete-button {
+    background-color: rgba(150, 60, 60, 0.8);
+    color: #ffcdd2;
 }
 
 .build-button {
-    width: 70px;
-    height: 40px;
     background-color: rgba(60, 120, 60, 0.8);
-    border: 1px solid #4caf50;
-    border-radius: 3px;
     color: #e8f5e8;
-    font-size: 12px;
 }
 
-.build-button:hover {
-    background-color: rgba(80, 160, 80, 0.9);
-    border-color: #81c784;
-}
-
-/* Панель действий со зданием */
-.building-action-panel {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 250px;
-    height: 50px;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* Общие кнопки панелей */
 .panel-button {
-    width: 70px;
-    height: 40px;
     background-color: rgba(60, 90, 150, 0.8);
-    border: 1px solid #4a6fc5;
-    border-radius: 3px;
     color: #bbdefb;
-    font-size: 12px;
 }
 
-.panel-button:hover {
-    background-color: rgba(80, 120, 200, 0.9);
-    border-color: #64b5f6;
-}
-
-/* Кнопка удаления */
-.delete-button {
-    width: 70px;
-    height: 40px;
-    background-color: rgba(150, 60, 60, 0.8);
-    border: 1px solid #f44336;
-    border-radius: 3px;
-    color: #ffcdd2;
-    font-size: 12px;
-}
-
-.delete-button:hover {
-    background-color: rgba(200, 80, 80, 0.9);
-    border-color: #ef5350;
-}
-
-/* Общие стили для элементов */
-Button {
-    -unity-text-align: middle-center;
-    cursor: pointer;
-    transition: all 0.1s ease;
-}
-
-Button:hover {
-    transform: scale(1.02);
-}
-
-Label {
-    -unity-text-align: middle-center;
-}
-
-/* Выбранные кнопки постройки */
+/* Выбранная кнопка постройки */
 .build-button.selected {
     background-color: rgba(100, 200, 100, 0.9);
-    border-color: #81c784;
-    box-shadow: 0 0 10px rgba(129, 199, 132, 0.5);
 }

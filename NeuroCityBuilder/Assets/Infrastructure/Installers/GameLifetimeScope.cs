@@ -1,7 +1,8 @@
 ﻿using Domain.Messages;
 using Infrastructure.Camera;
 using MessagePipe;
-using Presentation;
+using Presentation.System;
+using Presentation.Systems;
 using Presentation.UI;
 using Presentation.UI.Presenters;
 using Presentation.UI.Views;
@@ -24,6 +25,12 @@ namespace Infrastructure.Installers
             builder.RegisterMessageBroker<BuildingDeletedMessage>(options);
             builder.RegisterMessageBroker<BuildingDeselectedMessage>(options);
             builder.RegisterMessageBroker<BuildingDeleteRequestMessage>(options);
+            builder.RegisterMessageBroker<BuildingSelectedMessage>(options);
+            builder.RegisterMessageBroker<BuildingUpgradedMessage>(options);
+            builder.RegisterMessageBroker<BuildingMoveRequestMessage>(options);
+            builder.RegisterMessageBroker<BuildingMoveStartMessage>(options);
+            builder.RegisterMessageBroker<BuildingMoveCompleteMessage>(options);
+            builder.RegisterMessageBroker<BuildingMoveCancelMessage>(options);
 
             //Сервисы
             builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
@@ -36,13 +43,16 @@ namespace Infrastructure.Installers
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingActionPanelView>().AsSelf();
+            builder.RegisterComponentInHierarchy<BuildingInfoPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
-            builder.RegisterComponentInHierarchy<BuildingPlacementRunner>().AsSelf();
+            builder.RegisterComponentInHierarchy<BuildingSystemsRunner>().AsSelf();
 
             //Презентеры и системы
             builder.Register<BuildPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<BuildingActionPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<BuildingInteractionSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
+            builder.Register<BuildingInfoPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<BuildingMoveSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
 
             //Input
             builder.Register(resolver =>

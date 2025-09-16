@@ -13,12 +13,10 @@ namespace Infrastructure.Camera
         {
             this._playerInputActions = playerInputActions;
             this._cameraController = cameraController;
-            Debug.Log("CameraInputHandler constructor called");
         }
 
         public void Initialize()
         {
-            Debug.Log("CameraInputHandler initialized");
             this.EnableInput();
             this.SetupInput();
         }

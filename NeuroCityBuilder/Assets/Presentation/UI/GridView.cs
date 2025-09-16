@@ -1,20 +1,22 @@
 ﻿using Domain.Gameplay;
 using UnityEngine;
+using UseCases;
 
 namespace Presentation.UI
 {
     public class GridView : MonoBehaviour
     {
-        [Header("Grid Settings")]
-        [SerializeField] private int _width = 32;
-        [SerializeField] private int _height = 32;
+        [Header("Parent")]
         [SerializeField] private Transform _parent;
-
         [Header("Prefabs")]
         [SerializeField] private GridCell _gridCellPrefab;
+        [Header("Grid Manager")]
+        [SerializeField] private GridManager _gridManager;
 
         private GridCell[,] _gridCells;
         private GridCell _currentHighlightedCell;
+        private int _width;
+        private int _height;
 
         private void Start()
         {
@@ -23,6 +25,9 @@ namespace Presentation.UI
 
         private void CreateGrid()
         {
+            this._width = this._gridManager.GridWidth;
+            this._height = this._gridManager.GridHeight;
+
             this._gridCells = new GridCell[this._width, this._height];
 
             for (int x = 0; x < this._width; x++)
