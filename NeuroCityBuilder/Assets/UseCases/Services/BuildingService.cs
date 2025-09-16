@@ -163,6 +163,7 @@ namespace UseCases.Services
         public void Dispose()
         {
             this._deleteSubscription?.Dispose();
+            this._buildings.Clear();
         }
     }
 }

@@ -34,7 +34,8 @@ namespace UseCases
             {
                 Type = type,
                 Position = position,
-                CurrentLevel = 0
+                CurrentLevel = 0,
+                Levels = this.GetBuildingLevels(type)
             };
 
             this._buildingInstances[position] = buildingGO;
@@ -78,6 +79,36 @@ namespace UseCases
                     Destroy(buildingGO);
             }
             this._buildingInstances.Clear();
+        }
+
+        private BuildingLevel[] GetBuildingLevels(BuildingType type)
+        {
+            switch (type)
+            {
+                case BuildingType.House:
+                    return new[]
+                    {
+                new BuildingLevel { Level = 1, Cost = 100, Income = 10 },
+                new BuildingLevel { Level = 2, Cost = 200, Income = 25 },
+                new BuildingLevel { Level = 3, Cost = 300, Income = 35 }
+            };
+                case BuildingType.Farm:
+                    return new[]
+                    {
+                new BuildingLevel { Level = 1, Cost = 150, Income = 15 },
+                new BuildingLevel { Level = 2, Cost = 300, Income = 35 },
+                new BuildingLevel { Level = 3, Cost = 500, Income = 45 }
+            };
+                case BuildingType.Mine:
+                    return new[]
+                    {
+                new BuildingLevel { Level = 1, Cost = 200, Income = 20 },
+                new BuildingLevel { Level = 2, Cost = 400, Income = 50 },
+                new BuildingLevel { Level = 3, Cost = 600, Income = 80 }
+            };
+                default:
+                    return new BuildingLevel[0];
+            }
         }
     }
 }

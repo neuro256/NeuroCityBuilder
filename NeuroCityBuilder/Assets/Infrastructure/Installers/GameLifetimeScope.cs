@@ -24,6 +24,7 @@ namespace Infrastructure.Installers
             builder.RegisterMessageBroker<BuildingDeletedMessage>(options);
             builder.RegisterMessageBroker<BuildingDeselectedMessage>(options);
             builder.RegisterMessageBroker<BuildingDeleteRequestMessage>(options);
+            builder.RegisterMessageBroker<BuildingSelectedMessage>(options);
 
             //Сервисы
             builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
@@ -36,6 +37,7 @@ namespace Infrastructure.Installers
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingActionPanelView>().AsSelf();
+            builder.RegisterComponentInHierarchy<BuildingInfoPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingPlacementRunner>().AsSelf();
 
@@ -43,6 +45,7 @@ namespace Infrastructure.Installers
             builder.Register<BuildPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<BuildingActionPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<BuildingInteractionSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
+            builder.Register<BuildingInfoPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
 
             //Input
             builder.Register(resolver =>
