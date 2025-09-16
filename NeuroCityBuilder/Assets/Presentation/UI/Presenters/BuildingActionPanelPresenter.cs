@@ -14,6 +14,7 @@ namespace Presentation.UI.Presenters
         private readonly ISubscriber<BuildingDeselectedMessage> _buildingDeselectedSubscriber;
         private readonly IPublisher<BuildingDeleteRequestMessage> _buildingDeleteRequestPublisher;
         private readonly IPublisher<BuildingUpgradeRequestMessage> _buildingUpgradeRequestPublisher;
+        private readonly IPublisher<BuildingMoveRequestMessage> _buildingMoveRequestPublisher;
 
         private Building _selectedBuilding;
         private IDisposable _subscription;
@@ -22,12 +23,14 @@ namespace Presentation.UI.Presenters
             ISubscriber<BuildingSelectedMessage> buildingSelectedSubscriber,
             ISubscriber<BuildingDeselectedMessage> buildingDeselectedSubscriber,
             IPublisher<BuildingDeleteRequestMessage> buildingDeleteRequestPublisher,
-            IPublisher<BuildingUpgradeRequestMessage> buildingUpgradeRequestPublisher) : base(view) 
+            IPublisher<BuildingUpgradeRequestMessage> buildingUpgradeRequestPublisher,
+            IPublisher<BuildingMoveRequestMessage> buildingMoveRequestPublisher) : base(view) 
         {
             this._buildingSelectedSubscriber = buildingSelectedSubscriber;
             this._buildingDeselectedSubscriber = buildingDeselectedSubscriber;
             this._buildingDeleteRequestPublisher = buildingDeleteRequestPublisher;
             this._buildingUpgradeRequestPublisher = buildingUpgradeRequestPublisher;
+            this._buildingMoveRequestPublisher = buildingMoveRequestPublisher;
         }  
 
         public override void Initialize()
@@ -78,7 +81,6 @@ namespace Presentation.UI.Presenters
 
             if (this._selectedBuilding != null)
             {
-                // Проверяем, можно ли улучшить здание
                 if (this._selectedBuilding.CurrentLevel < this._selectedBuilding.Levels.Length - 1)
                 {
                     this._buildingUpgradeRequestPublisher.Publish(new BuildingUpgradeRequestMessage
@@ -95,7 +97,17 @@ namespace Presentation.UI.Presenters
 
         private void HandleMoveClicked()
         {
-            throw new NotImplementedException();
+            Debug.Log("BuildingActionPanelPresenter: HandleMoveClicked");
+
+            if (this._selectedBuilding != null)
+            {
+                this._buildingMoveRequestPublisher.Publish(new BuildingMoveRequestMessage
+                {
+                    Building = this._selectedBuilding
+                });
+
+                this.view.HidePanel();
+            }
         }
 
         private void UpdateUpgradeButtonState(Building building)

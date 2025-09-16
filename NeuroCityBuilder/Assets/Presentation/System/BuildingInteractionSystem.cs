@@ -9,7 +9,7 @@ using UseCases.Services;
 using VContainer.Unity;
 using UnityEngine.InputSystem;
 
-namespace Presentation
+namespace Presentation.System
 {
     public class BuildingInteractionSystem : IInitializable, IDisposable
     {
@@ -22,7 +22,6 @@ namespace Presentation
 
         private BuildingType _selectedBuildingType;
         private bool _isPlacingBuilding;
-        private Building _selectedBuilding;
         private IDisposable _subscription;
         private LayerMask _gridLayerMask = 1 << LayerMask.NameToLayer("Grid");
 
@@ -127,7 +126,6 @@ namespace Presentation
                     {
                         this._gridView.HideHighlight();
                         this._buildingService.DeselectBuilding();
-                        this._selectedBuilding = null;
                     }
                 }
             }

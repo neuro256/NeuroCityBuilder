@@ -11,7 +11,6 @@ namespace Presentation.UI.Presenters
 
         public override void Initialize()
         {
-            throw new System.NotImplementedException();
         }
 
         public override void Dispose()

@@ -42,5 +42,26 @@ namespace Domain.Messages
     {
         public Building Building;
     }
+
+    public struct BuildingMoveRequestMessage
+    {
+        public Building Building;
+    }
+
+    public struct BuildingMoveStartMessage
+    {
+        public Building Building;
+    }
+
+    public struct BuildingMoveCompleteMessage
+    {
+        public Building Building;
+        public GridPos NewPosition;
+    }
+
+    public struct BuildingMoveCancelMessage
+    {
+        public Building Building;
+    }
 }
 
