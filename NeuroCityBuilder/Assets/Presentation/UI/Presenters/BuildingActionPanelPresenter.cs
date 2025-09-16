@@ -6,10 +6,7 @@ namespace Presentation.UI.Presenters
 {
     public class BuildingActionPanelPresenter : PanelPresenterBase<BuildingActionPanelView>
     {
-        public BuildingActionPanelPresenter(BuildingActionPanelView view)
-        {
-            this.view = view;
-        }
+        public BuildingActionPanelPresenter(BuildingActionPanelView view) : base(view) { }  
 
         public override void Initialize()
         {

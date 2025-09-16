@@ -1,9 +1,15 @@
-﻿using VContainer;
-using VContainer.Unity;
-using MessagePipe;
-using UnityEngine;
-using UseCases.Services;
+﻿using Domain.Messages;
 using Infrastructure.Camera;
+using MessagePipe;
+using Presentation;
+using Presentation.UI;
+using Presentation.UI.Presenters;
+using Presentation.UI.Views;
+using UnityEngine;
+using UseCases;
+using UseCases.Services;
+using VContainer;
+using VContainer.Unity;
 //using Presentation.UI.Views;
 
 namespace Infrastructure.Installers
@@ -12,16 +18,28 @@ namespace Infrastructure.Installers
     {
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterMessagePipe();
+            MessagePipeOptions options = builder.RegisterMessagePipe();
+            builder.RegisterMessageBroker<BuildingSelectedMessage>(options);
+            builder.RegisterMessageBroker<BuildingPlacedMessage>(options);
 
+            //Сервисы
             builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
 
+            //Компоненты сцены
             //builder.RegisterComponentInHierarchy<SaveLoadPanelView>().AsSelf();
-
             //builder.Register<SaveLoadPanelPresenter>(Lifetime.Singleton);
-
+            builder.RegisterComponentInHierarchy<BuildingFactory>().AsSelf();
+            builder.RegisterComponentInHierarchy<GridManager>().AsSelf();
+            builder.RegisterComponentInHierarchy<GridView>().AsSelf();
+            builder.RegisterComponentInHierarchy<BuildPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
+            builder.RegisterComponentInHierarchy<BuildingPlacementRunner>().AsSelf();
 
+            //Презентеры и системы
+            builder.Register<BuildPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<BuildingPlacementSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
+
+            //Input
             builder.Register(resolver =>
             {
                 PlayerInputActions controls = new PlayerInputActions();

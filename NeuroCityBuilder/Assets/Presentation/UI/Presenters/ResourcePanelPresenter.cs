@@ -7,10 +7,7 @@ namespace Presentation.UI.Presenters
 {
     public class ResourcePanelPresenter : PanelPresenterBase<ResourcePanelView>
     {
-        public ResourcePanelPresenter(ResourcePanelView view)
-        {
-            this.view = view;
-        }
+        public ResourcePanelPresenter(ResourcePanelView view) : base(view) { } 
 
         public override void Initialize()
         {
