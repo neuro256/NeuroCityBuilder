@@ -81,8 +81,6 @@ namespace Presentation.UI.Presenters
                 // Проверяем, можно ли улучшить здание
                 if (this._selectedBuilding.CurrentLevel < this._selectedBuilding.Levels.Length - 1)
                 {
-                    Debug.Log($"Sending upgrade request for building {this._selectedBuilding.Type}");
-
                     this._buildingUpgradeRequestPublisher.Publish(new BuildingUpgradeRequestMessage
                     {
                         Building = this._selectedBuilding
@@ -90,7 +88,6 @@ namespace Presentation.UI.Presenters
                 }
                 else
                 {
-                    Debug.Log("Building is already at max level");
                     this.view.EnableUpgradeButton(false);
                 }
             }

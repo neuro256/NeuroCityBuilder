@@ -43,7 +43,6 @@ namespace Presentation
 
         public void Initialize()
         {
-            Debug.Log("Interaction System Init");
             DisposableBagBuilder bag = DisposableBag.CreateBuilder();
             this._buildingTypeSelectedSubscriber.Subscribe(this.OnBuildingTypeSelected).AddTo(bag);
             this._subscription = bag.Build();
@@ -53,7 +52,6 @@ namespace Presentation
         {
             this._selectedBuildingType = message.BuildingType;
             this._isPlacingBuilding = true;
-            Debug.Log($"Ready to place: {this._selectedBuildingType}");
         }
 
         public void Update()
@@ -91,11 +89,9 @@ namespace Presentation
 
         private void PlaceBuildingAt(GridPos position)
         {
-            Debug.Log($"PlaceBuildingAt: {position}");
             Building building = this._buildingService.PlaceBuilding(this._selectedBuildingType, position);
             if (building != null)
             {
-                Debug.Log($"Building placed at {position.X},{position.Y}");
                 this._isPlacingBuilding = false;
                 this._gridView.HideHighlight();
             }
@@ -124,13 +120,11 @@ namespace Presentation
 
                     if (building != null)
                     {
-                        Debug.Log("BUild clicked");
                         this._gridView.ShowHighlight(gridPos, true);
                         this._buildingService.SelectBuilding(building);
                     }
                     else
                     {
-                        Debug.Log("BUild is null");
                         this._gridView.HideHighlight();
                         this._buildingService.DeselectBuilding();
                         this._selectedBuilding = null;
