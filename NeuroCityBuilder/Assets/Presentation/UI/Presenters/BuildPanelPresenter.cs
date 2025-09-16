@@ -1,16 +1,18 @@
-﻿using Domain.Gameplay;
+﻿using Domain.Messages;
+using Domain.Gameplay;
+using MessagePipe;
 using Presentation.UI.Views;
-using System;
 using UnityEngine;
-using VContainer.Unity;
 
 namespace Presentation.UI.Presenters
 {
     public class BuildPanelPresenter : PanelPresenterBase<BuildPanelView>
     {
-        public BuildPanelPresenter(BuildPanelView view)
+        private readonly IPublisher<BuildingSelectedMessage> _buildingSelectedPublisher;
+
+        public BuildPanelPresenter(BuildPanelView view, IPublisher<BuildingSelectedMessage> buildingSelectedPublisher) : base(view)
         {
-            this.view = view;
+            this._buildingSelectedPublisher = buildingSelectedPublisher;
         }
 
         public override void Initialize()
@@ -18,9 +20,14 @@ namespace Presentation.UI.Presenters
             this.view.onBuildSelected += (buildType) => this.HandleBuildingSelection(buildType);
         }
 
-        private void HandleBuildingSelection(BuildingType buildType)
+        private void HandleBuildingSelection(BuildingType buildingType)
         {
-            Debug.Log($"HandleBuildingSelection: {buildType}");
+            Debug.Log($"HandleBuildingSelection: {buildingType}");
+
+            this._buildingSelectedPublisher.Publish(new BuildingSelectedMessage
+            {
+                BuildingType = buildingType
+            });
         }
 
         public override void Dispose()

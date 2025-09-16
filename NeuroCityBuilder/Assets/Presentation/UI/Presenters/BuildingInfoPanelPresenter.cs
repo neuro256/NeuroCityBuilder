@@ -5,12 +5,9 @@ namespace Presentation.UI.Presenters
 {
     public class BuildingInfoPanelPresenter : PanelPresenterBase<BuildingInfoPanelView>
     {
-        public BuildingInfoPanelPresenter(BuildingInfoPanelView view)
+        public BuildingInfoPanelPresenter(BuildingInfoPanelView view) : base(view)
         {
-            this.view = view;
         }
-
-
     }
 }
 

@@ -1,73 +1,75 @@
-﻿using Domain.Gameplay;
+﻿using Domain.Messages;
+using Domain.Gameplay;
+using MessagePipe;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace UseCases.Services
 {
     public class BuildingService : IBuildingService
     {
-        private readonly List<Building> _buildings = new();
+        private readonly GridManager _gridManager;
+        private readonly BuildingFactory _buildingFactory;
+        private readonly IPublisher<BuildingPlacedMessage> _buildingPlacedPublisher;
 
+        public BuildingService(
+        GridManager gridManager,
+        IPublisher<BuildingPlacedMessage> buildingPlacedPublisher,
+        BuildingFactory buildingFactory)
+        {
+            this._gridManager = gridManager;
+            this._buildingPlacedPublisher = buildingPlacedPublisher;
+            this._buildingFactory = buildingFactory;
+        }
 
         public Building MoveBuilding(GridPos startPos, GridPos endPos)
         {
-            Building building = this.GetBuildingAt(endPos);
-            
-            if (building == null)
-                return null;
-            if (this.GetBuildingAt(startPos) != null)
+            if (this._gridManager.IsCellOccupied(endPos))
                 return null;
 
-            building.Position = startPos;
-            return building;
+            this._gridManager.SetCellOccupied(startPos, false);
+            this._gridManager.SetCellOccupied(endPos, true);
+
+            // В реальной реализации здесь бы обновлялась позиция здания
+            return null;
         }
 
         public Building PlaceBuilding(BuildingType type, GridPos position)
         {
-            if (this.GetBuildingAt(position) == null)
+            Debug.Log($"PlaceBuilding type: {type} pos: {position}");
+
+            if (this._gridManager.IsCellOccupied(position))
             {
-                Building building = this.CreateBuilding(type, position);
-                this._buildings.Add(building);
-                return building;
-            }
-
-            return null;
-        }
-
-        public void RemoveBuilding(GridPos position)
-        {
-            Building building = this.GetBuildingAt(position);
-            if (building != null)
-            {
-                this._buildings.Remove(building);
-            }
-        }
-
-        public Building UpgradeBuilding(GridPos position)
-        {
-            Building building = this.GetBuildingAt(position);
-            if (building == null) 
+                Debug.LogWarning($"Cell {position.X},{position.Y} is already occupied!");
                 return null;
-
-            if (building.CurrentLevel < building.Levels.Length - 1)
-            {
-                building.CurrentLevel++;
             }
+
+            // Создаем здание через фабрику
+            Building building = this._buildingFactory.CreateBuilding(type, position);
+
+            // Занимаем клетку
+            this._gridManager.SetCellOccupied(position, true);
+
+            // Публикуем сообщение о размещении
+            this._buildingPlacedPublisher.Publish(new BuildingPlacedMessage
+            {
+                Building = building,
+                Position = position
+            });
 
             return building;
         }
 
-        private Building CreateBuilding(BuildingType type, GridPos position)
+        public void RemoveBuilding(GridPos position)
         {
-            return new Building
-            {
-                Type = type,
-                Position = position,
-                CurrentLevel = 0
-            };
+            this._gridManager.SetCellOccupied(position, false);
         }
 
-        private Building GetBuildingAt(GridPos position) => this._buildings.FirstOrDefault(b => b.Position.Equals(position));
+        public Building UpgradeBuilding(GridPos position)
+        {
+            return null;
+        }
     }
 }
 

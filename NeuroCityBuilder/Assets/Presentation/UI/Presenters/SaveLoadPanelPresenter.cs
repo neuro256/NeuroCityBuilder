@@ -7,10 +7,7 @@ namespace Presentation.UI.Presenters
 {
     public class SaveLoadPanelPresenter : PanelPresenterBase<SaveLoadPanelView>
     {
-        public SaveLoadPanelPresenter(SaveLoadPanelView view)
-        {
-            this.view = view;
-        }
+        public SaveLoadPanelPresenter(SaveLoadPanelView view) : base(view) { }
 
         public override void Initialize()
         {
