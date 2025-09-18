@@ -954,7 +954,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveSpeed: 5
-  _zoomSpeed: 2
+  _dragSpeed: 5
+  _smoothTime: 0.15
+  _zoomSpeed: 3
   _minZoom: 5
   _maxZoom: 50
 --- !u!1001 &4144771040680871025
