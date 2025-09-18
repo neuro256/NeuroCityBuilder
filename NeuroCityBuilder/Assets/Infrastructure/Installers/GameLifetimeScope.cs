@@ -36,6 +36,7 @@ namespace Infrastructure.Installers
             //Сервисы
             builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
             builder.Register<IResourceService, ResourceService>(Lifetime.Singleton);
+            builder.Register<IIncomeService, IncomeService>(Lifetime.Singleton);
 
             //Компоненты сцены
             //builder.RegisterComponentInHierarchy<SaveLoadPanelView>().AsSelf();
