@@ -6,18 +6,18 @@ namespace Infrastructure
 {
     public class GameEntryPoint : IStartable
     {
-        private readonly IResourceService _resourceService;
+        private readonly IIncomeService _incomeService;
 
-        public GameEntryPoint(IResourceService resourceService)
+        public GameEntryPoint(IIncomeService incomeService)
         {
-            this._resourceService = resourceService;
+            this._incomeService = incomeService;
         }
 
         public void Start()
         {
             Debug.Log("Game started");
 
-            this._resourceService.StartIncomeGeneration();
+            this._incomeService.StartIncomeGeneration();
         }
     }
 }
