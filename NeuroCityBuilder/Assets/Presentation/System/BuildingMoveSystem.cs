@@ -4,6 +4,7 @@ using MessagePipe;
 using Presentation.UI;
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UseCases;
 using UseCases.Services;
@@ -22,6 +23,7 @@ namespace Presentation.Systems
         private readonly IPublisher<BuildingMoveCompleteMessage> _buildingMoveCompletePublisher;
         private readonly IPublisher<BuildingMoveCancelMessage> _buildingMoveCancelPublisher;
 
+        private LayerMask _gridLayerMask = 1 << LayerMask.NameToLayer("Grid");
         private Camera _mainCamera;
         private Building _movingBuilding;
         private bool _isMoving;
@@ -87,10 +89,13 @@ namespace Presentation.Systems
 
         private void HandleMovement()
         {
+            if (EventSystem.current?.IsPointerOverGameObject() == true)
+                return;
+
             Vector2 mousePosition = Mouse.current.position.ReadValue();
             Ray ray = this._mainCamera.ScreenPointToRay(mousePosition);
 
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, this._gridLayerMask))
             {
                 GridPos gridPos = this._gridView.WorldToGrid(hit.point);
                 bool isValid = !this._gridManager.IsCellOccupied(gridPos);

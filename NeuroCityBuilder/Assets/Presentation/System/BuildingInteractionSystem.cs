@@ -1,13 +1,14 @@
-﻿using Domain.Messages;
-using Domain.Gameplay;
+﻿using Domain.Gameplay;
+using Domain.Messages;
 using MessagePipe;
 using Presentation.UI;
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UseCases;
 using UseCases.Services;
 using VContainer.Unity;
-using UnityEngine.InputSystem;
 
 namespace Presentation.System
 {
@@ -65,6 +66,9 @@ namespace Presentation.System
         {
             if (!this._isPlacingBuilding) return;
 
+            if (EventSystem.current?.IsPointerOverGameObject() == true)
+                return;
+
             Vector2 mousePosition = Mouse.current.position.ReadValue();
             Ray ray = this._camera.ScreenPointToRay(mousePosition);
 
@@ -107,6 +111,9 @@ namespace Presentation.System
         private void HandleBuildingSelection()
         {
             if (this._isPlacingBuilding) return;
+
+            if (EventSystem.current?.IsPointerOverGameObject() == true)
+                return;
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
