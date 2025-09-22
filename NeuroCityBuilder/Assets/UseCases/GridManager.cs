@@ -1,22 +1,20 @@
 ﻿using Domain.Gameplay;
+using System;
 using UnityEngine;
 
 namespace UseCases
 {
-    public class GridManager : MonoBehaviour
+    public class GridManager
     {
-        [SerializeField] private int _width = 32;
-        [SerializeField] private int _height = 32;
-        [SerializeField] private float _cellSize = 1f;
-
         private bool[,] _occupiedCells;
+        private int _width;
+        private int _height;
 
-        public int GridWidth => this._width;
-        public int GridHeight => this._height;
-
-        private void Awake()
+        public GridManager(int width, int height)
         {
-            this._occupiedCells = new bool[this._width, this._height];
+            this._width = width;
+            this._height = height;
+            this._occupiedCells = new bool[width, height];
         }
 
         public bool IsCellOccupied(GridPos pos)
@@ -37,14 +35,14 @@ namespace UseCases
 
         public GridPos WorldToGrid(Vector3 worldPosition)
         {
-            int x = Mathf.FloorToInt(worldPosition.x / this._cellSize);
-            int y = Mathf.FloorToInt(worldPosition.z / this._cellSize);
+            int x = Mathf.RoundToInt(worldPosition.x);
+            int y = Mathf.RoundToInt(worldPosition.z);
             return new GridPos(x, y);
         }
 
         public Vector3 GridToWorld(GridPos gridPos)
         {
-            return new Vector3(gridPos.X * this._cellSize, 0, gridPos.Y * this._cellSize);
+            return new Vector3(gridPos.X, 0, gridPos.Y);
         }
 
         public void ClearCells()

@@ -2,6 +2,7 @@
 using Domain.Messages;
 using MessagePipe;
 using Presentation.UI;
+using Presentation.UI.Presenters;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -17,7 +18,7 @@ namespace Presentation.Systems
         private readonly ISubscriber<BuildingMoveRequestMessage> _buildingMoveRequestSubscriber;
         private readonly IBuildingService _buildingService;
         private readonly GridManager _gridManager;
-        private readonly GridView _gridView;
+        private readonly GridPresenter _gridPresenter;
         private readonly BuildingFactory _buildingFactory;
         private readonly IPublisher<BuildingMoveStartMessage> _buildingMoveStartPublisher;
         private readonly IPublisher<BuildingMoveCompleteMessage> _buildingMoveCompletePublisher;
@@ -33,7 +34,7 @@ namespace Presentation.Systems
             ISubscriber<BuildingMoveRequestMessage> buildingMoveRequestSubscriber,
             IBuildingService buildingService,
             GridManager gridManager,
-            GridView gridView,
+            GridPresenter gridPresenter,
             BuildingFactory buildingFactory,
             IPublisher<BuildingMoveStartMessage> buildingMoveStartPublisher,
             IPublisher<BuildingMoveCompleteMessage> buildingMoveCompletePublisher,
@@ -42,7 +43,7 @@ namespace Presentation.Systems
             this._buildingMoveRequestSubscriber = buildingMoveRequestSubscriber;
             this._buildingService = buildingService;
             this._gridManager = gridManager;
-            this._gridView = gridView;
+            this._gridPresenter = gridPresenter;
             this._buildingFactory = buildingFactory;
             this._buildingMoveStartPublisher = buildingMoveStartPublisher;
             this._buildingMoveCompletePublisher = buildingMoveCompletePublisher;
@@ -70,7 +71,7 @@ namespace Presentation.Systems
             this._isMoving = true;
 
             this._buildingService.RemoveBuilding(building);
-            Vector3 startPosition = this._gridView.GridToWorld(building.Position);
+            Vector3 startPosition = this._gridManager.GridToWorld(building.Position);
             this._buildingFactory.CreateGhostBuilding(building.Type, startPosition);
             this._buildingMoveStartPublisher.Publish(new BuildingMoveStartMessage
             {
@@ -97,11 +98,10 @@ namespace Presentation.Systems
 
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, this._gridLayerMask))
             {
-                GridPos gridPos = this._gridView.WorldToGrid(hit.point);
+                GridPos gridPos = this._gridManager.WorldToGrid(hit.point);
                 bool isValid = !this._gridManager.IsCellOccupied(gridPos);
-                this._gridView.ShowHighlight(gridPos, isValid);
-                Vector3 worldPosition = this._gridView.GridToWorld(gridPos);
-                this._buildingFactory.UpdateGhostBuildingPosition(worldPosition);
+                this._gridPresenter.ShowHighlight(gridPos, isValid);
+                this._buildingFactory.UpdateGhostBuildingPosition(hit.point);
 
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
@@ -129,7 +129,7 @@ namespace Presentation.Systems
             }
 
             this._buildingFactory.DestroyGhostBuilding();
-            this._gridView.HideHighlight();
+            this._gridPresenter.HideHighlight();
 
 
             this._buildingMoveCompletePublisher.Publish(new BuildingMoveCompleteMessage
@@ -150,7 +150,7 @@ namespace Presentation.Systems
 
             this._buildingService.PlaceBuilding(this._movingBuilding.Type, this._movingBuilding.Position);
             this._buildingFactory.DestroyGhostBuilding();
-            this._gridView.HideHighlight();
+            this._gridPresenter.HideHighlight();
 
             this._buildingMoveCancelPublisher.Publish(new BuildingMoveCancelMessage
             {
