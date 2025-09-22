@@ -6,12 +6,12 @@ namespace UseCases.Services
     public interface IBuildingService
     {
         Building PlaceBuilding(BuildingType type, GridPos position, bool isNewBuilding = false);
-        void RemoveBuilding(GridPos position);
-        Building MoveBuilding(GridPos startPos, GridPos endPos);
-        Building UpgradeBuilding(GridPos position);
+        void RemoveBuilding(Building building);
+        Building UpgradeBuilding(Building building);
         Building GetBuildingAt(GridPos position);
         void SelectBuilding(Building building);
         void DeselectBuilding();
         List<Building> GetAllBuildings();
+        void ClearAllBuildings();
     }
 }
