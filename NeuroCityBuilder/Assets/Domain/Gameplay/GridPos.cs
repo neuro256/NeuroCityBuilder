@@ -1,9 +1,13 @@
-﻿namespace Domain.Gameplay
+﻿using System;
+using UnityEngine;
+
+namespace Domain.Gameplay
 {
-    public class GridPos
+    [Serializable]
+    public struct GridPos
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        [SerializeField] public int X;
+        [SerializeField] public int Y;
 
         public GridPos(int x, int y)
         {
@@ -11,15 +15,9 @@
             this.Y = y;
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is GridPos pos && this.X == pos.X && this.Y == pos.Y;
-        }
+        public override bool Equals(object obj) => obj is GridPos other && this.X == other.X && this.Y == other.Y;
 
-        public override int GetHashCode()
-        {
-            return this.X.GetHashCode() ^ this.Y.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(this.X, this.Y);
     }
 }
 

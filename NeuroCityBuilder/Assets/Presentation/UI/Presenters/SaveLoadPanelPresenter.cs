@@ -1,13 +1,19 @@
 ﻿using Presentation.UI.Views;
 using System;
 using UnityEngine;
+using UseCases.Services;
 using VContainer.Unity;
 
 namespace Presentation.UI.Presenters
 {
     public class SaveLoadPanelPresenter : PanelPresenterBase<ISaveLoadPanelView>
     {
-        public SaveLoadPanelPresenter(ISaveLoadPanelView view) : base(view) { }
+        private readonly IGameSaveService _saveService;
+
+        public SaveLoadPanelPresenter(ISaveLoadPanelView view, IGameSaveService saveService) : base(view) 
+        {
+            this._saveService = saveService;
+        }
 
         public override void Initialize()
         {
@@ -17,13 +23,13 @@ namespace Presentation.UI.Presenters
 
         private void HandleSaveClicked()
         {
-            //this._saveService.SaveGame();
+            this._saveService.SaveGame();
             Debug.Log("Game saved");
         }
 
         private void HandleLoadClicked()
         {
-            //_saveService.LoadGame();
+            this._saveService.LoadGame();
             Debug.Log("Game loaded");
         }
 
