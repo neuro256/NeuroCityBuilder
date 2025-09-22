@@ -6,7 +6,6 @@ using Presentation.Systems;
 using Presentation.UI;
 using Presentation.UI.Presenters;
 using Presentation.UI.Views;
-using UnityEngine;
 using UseCases;
 using UseCases.Services;
 using VContainer;
@@ -37,9 +36,9 @@ namespace Infrastructure.Installers
             builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
             builder.Register<IResourceService, ResourceService>(Lifetime.Singleton);
             builder.Register<IIncomeService, IncomeService>(Lifetime.Singleton);
+            builder.Register<IGameSaveService, GameSaveService>(Lifetime.Singleton);
 
             //Компоненты сцены
-            //builder.RegisterComponentInHierarchy<SaveLoadPanelView>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingFactory>().AsSelf();
             builder.RegisterComponentInHierarchy<GridManager>().AsSelf();
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
@@ -49,6 +48,7 @@ namespace Infrastructure.Installers
             builder.RegisterComponentInHierarchy<BuildingActionPanelView>().As<IBuildingActionPanelView>();
             builder.RegisterComponentInHierarchy<BuildingInfoPanelView>().As<IBuildingInfoPanelView>();
             builder.RegisterComponentInHierarchy<ResourcePanelView>().As<IResourcePanelView>();
+            builder.RegisterComponentInHierarchy<SaveLoadPanelView>().As<ISaveLoadPanelView>();
 
             //Презентеры и системы
             builder.Register<BuildPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
@@ -57,6 +57,7 @@ namespace Infrastructure.Installers
             builder.Register<BuildingInfoPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<BuildingMoveSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
             builder.Register<ResourcePanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<SaveLoadPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
 
             //Input
             builder.Register(resolver =>

@@ -46,6 +46,14 @@ namespace UseCases
         {
             return new Vector3(gridPos.X * this._cellSize, 0, gridPos.Y * this._cellSize);
         }
+
+        public void ClearCells()
+        {
+            if (this._occupiedCells != null)
+            {
+                this._occupiedCells = new bool[this._width, this._height];
+            }
+        }
     }
 }
 

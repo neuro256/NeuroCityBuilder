@@ -113,8 +113,6 @@ namespace UseCases.Services
 
             this._buildings.Remove(building);
 
-            
-
             if (this._selectedBuilding != null && this._selectedBuilding.Position.Equals(deletedPosition))
             {
                 this._selectedBuilding = null;
@@ -220,11 +218,14 @@ namespace UseCases.Services
 
         public void ClearAllBuildings()
         {
-            foreach (Building building in this._buildings)
+            List<Building> buildingsCopy = new List<Building>(this._buildings);
+
+            foreach (Building building in buildingsCopy)
             {
                 this.RemoveBuilding(building);
             }
 
+            this._gridManager.ClearCells();
             this._buildings.Clear();
         }
     }
