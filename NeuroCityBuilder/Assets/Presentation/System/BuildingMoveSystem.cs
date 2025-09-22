@@ -69,7 +69,7 @@ namespace Presentation.Systems
             this._movingBuilding = building;
             this._isMoving = true;
 
-            this._buildingService.RemoveBuilding(building.Position);
+            this._buildingService.RemoveBuilding(building);
             Vector3 startPosition = this._gridView.GridToWorld(building.Position);
             this._buildingFactory.CreateGhostBuilding(building.Type, startPosition);
             this._buildingMoveStartPublisher.Publish(new BuildingMoveStartMessage

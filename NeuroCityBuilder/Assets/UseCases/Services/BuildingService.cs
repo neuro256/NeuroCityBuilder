@@ -3,9 +3,7 @@ using Domain.Messages;
 using MessagePipe;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace UseCases.Services
 {
@@ -23,7 +21,7 @@ namespace UseCases.Services
         private readonly ISubscriber<BuildingMoveRequestMessage> _buildingMoveRequestSubscriber;
 
         private readonly IResourceService _resourceService;
-        private readonly Dictionary<GridPos, Building> _buildings = new();
+        private readonly List<Building> _buildings = new();
         private Building _selectedBuilding;
         private IDisposable _deleteSubscription;
         private IDisposable _upgradeSubscription;
@@ -59,28 +57,6 @@ namespace UseCases.Services
             this._moveSubscription = this._buildingMoveRequestSubscriber.Subscribe(this.HandleMoveRequest);
         }
 
-        public Building MoveBuilding(GridPos startPos, GridPos endPos)
-        {
-            if (!this._buildings.TryGetValue(startPos, out Building building))
-                return null;
-
-            if (this._gridManager.IsCellOccupied(endPos))
-                return null;
-
-            // Перемещаем здание
-            building.Position = endPos;
-
-            // Обновляем хранилище
-            this._buildings.Remove(startPos);
-            this._buildings[endPos] = building;
-
-            // Обновляем сетку
-            this._gridManager.SetCellOccupied(startPos, false);
-            this._gridManager.SetCellOccupied(endPos, true);
-
-            return building;
-        }
-
         public Building PlaceBuilding(BuildingType type, GridPos position, bool isNewBuilding = false)
         {
             Debug.Log($"PlaceBuilding type: {type} pos: {position}");
@@ -109,7 +85,8 @@ namespace UseCases.Services
                 Position = position
             });
 
-            this._buildings[position] = building;
+            if(!this._buildings.Contains(building))
+                this._buildings.Add(building);
 
             return building;
         }
@@ -121,62 +98,66 @@ namespace UseCases.Services
             return levels[level].Cost;
         }
 
-        public void RemoveBuilding(GridPos position)
+        public void RemoveBuilding(Building building)
         {
-            if (this._buildings.TryGetValue(position, out Building building))
+            if (!this._buildings.Contains(building))
+                return;
+
+            Building deletedBuilding = building;
+            GridPos deletedPosition = building.Position;
+
+            this._gridManager.SetCellOccupied(building.Position, false);
+            this._buildingFactory.RemoveBuildingVisual(deletedPosition);
+
+            Debug.Log($"Building removed from position {deletedPosition.X},{deletedPosition.Y}");
+
+            this._buildings.Remove(building);
+
+            
+
+            if (this._selectedBuilding != null && this._selectedBuilding.Position.Equals(deletedPosition))
             {
-                Building deletedBuilding = building;
-                GridPos deletedPosition = position;
-
-                this._gridManager.SetCellOccupied(position, false);
-                this._buildingFactory.RemoveBuildingVisual(position);
-                this._buildings.Remove(position);
-
-                Debug.Log($"Building removed from position {position.X},{position.Y}");
-
-                if (this._selectedBuilding != null && this._selectedBuilding.Position.Equals(position))
-                {
-                    this._selectedBuilding = null;
-                }
-
-                this._buildingDeletedPublisher.Publish(new BuildingDeletedMessage
-                {
-                    Building = deletedBuilding,
-                    Position = deletedPosition
-                });
+                this._selectedBuilding = null;
             }
+
+            this._buildingDeletedPublisher.Publish(new BuildingDeletedMessage
+            {
+                Building = deletedBuilding,
+                Position = deletedPosition
+            });
         }
 
-        public Building UpgradeBuilding(GridPos position)
+        public Building UpgradeBuilding(Building building)
         {
-            if (this._buildings.TryGetValue(position, out Building building))
+            if (!this._buildings.Contains(building))
+                return null;
+
+            if (building.CurrentLevel < building.Levels.Length - 1)
             {
-                if (building.CurrentLevel < building.Levels.Length - 1)
+                int nextLevelIndex = building.CurrentLevel + 1;
+                if (nextLevelIndex < building.Levels.Length)
                 {
-                    int nextLevelIndex = building.CurrentLevel + 1;
-                    if (nextLevelIndex < building.Levels.Length)
+                    int upgradeCost = building.Levels[nextLevelIndex].Cost;
+
+                    if (this._resourceService.CanAfford(upgradeCost))
                     {
-                        int upgradeCost = building.Levels[nextLevelIndex].Cost;
+                        this._resourceService.SpendGold(upgradeCost);
+                        building.CurrentLevel++;
 
-                        if (this._resourceService.CanAfford(upgradeCost))
+                        this._buildingUpgradedPublisher.Publish(new BuildingUpgradedMessage
                         {
-                            this._resourceService.SpendGold(upgradeCost);
-                            building.CurrentLevel++;
+                            Building = building
+                        });
 
-                            this._buildingUpgradedPublisher.Publish(new BuildingUpgradedMessage
-                            {
-                                Building = building
-                            });
-
-                            return building;
-                        }
+                        return building;
                     }
                 }
-                else
-                {
-                    Debug.Log("Building is already at max level");
-                }
             }
+            else
+            {
+                Debug.Log("Building is already at max level");
+            }
+
             return null;
         }
 
@@ -193,9 +174,10 @@ namespace UseCases.Services
 
         public Building GetBuildingAt(GridPos position)
         {
-            this._buildings.TryGetValue(position, out Building building);
-            Debug.Log($"GetBuildingAt: pos={position.X}:{position.Y} result={building != null} ");
-            return building;
+            Building findedBuilding = this._buildings.Find(b => b.Position.Equals(position));
+
+            Debug.Log($"GetBuildingAt: pos={position.X}:{position.Y} result={findedBuilding != null} ");
+            return findedBuilding;
         }
 
         public void DeselectBuilding()
@@ -208,13 +190,13 @@ namespace UseCases.Services
         private void HandleDeleteRequest(BuildingDeleteRequestMessage message)
         {
             Debug.Log($"HandleDeleteRequest: type={message.Building.Type} pos={message.Building.Position.X}:{message.Building.Position.Y}");
-            this.RemoveBuilding(message.Building.Position);
+            this.RemoveBuilding(message.Building);
         }
 
         private void HandleUpgradeRequest(BuildingUpgradeRequestMessage message)
         {
             Debug.Log($"BuildingService: Upgrade request received for building {message.Building.Type} at {message.Building.Position.X},{message.Building.Position.Y}");
-            this.UpgradeBuilding(message.Building.Position);
+            this.UpgradeBuilding(message.Building);
         }
 
         private void HandleMoveRequest(BuildingMoveRequestMessage message)
@@ -233,7 +215,17 @@ namespace UseCases.Services
 
         public List<Building> GetAllBuildings()
         {
-            return this._buildings.Values.ToList();
+            return this._buildings;
+        }
+
+        public void ClearAllBuildings()
+        {
+            foreach (Building building in this._buildings)
+            {
+                this.RemoveBuilding(building);
+            }
+
+            this._buildings.Clear();
         }
     }
 }
