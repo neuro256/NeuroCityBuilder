@@ -6,16 +6,19 @@ using Presentation.Systems;
 using Presentation.UI;
 using Presentation.UI.Presenters;
 using Presentation.UI.Views;
+using UnityEngine;
 using UseCases;
 using UseCases.Services;
 using VContainer;
 using VContainer.Unity;
-//using Presentation.UI.Views;
 
 namespace Infrastructure.Installers
 {
     public class GameLifetimeScope : LifetimeScope
     {
+        [SerializeField] private int _gridWidth = 32;
+        [SerializeField] private int _gridHeight = 32;
+
         protected override void Configure(IContainerBuilder builder)
         {
             MessagePipeOptions options = builder.RegisterMessagePipe();
@@ -37,10 +40,13 @@ namespace Infrastructure.Installers
             builder.Register<IResourceService, ResourceService>(Lifetime.Singleton);
             builder.Register<IIncomeService, IncomeService>(Lifetime.Singleton);
             builder.Register<IGameSaveService, GameSaveService>(Lifetime.Singleton);
+            builder.Register(resolver =>
+            {
+                return new GridManager(this._gridWidth, this._gridHeight);
+            }, Lifetime.Singleton).AsSelf();
 
             //Компоненты сцены
             builder.RegisterComponentInHierarchy<BuildingFactory>().AsSelf();
-            builder.RegisterComponentInHierarchy<GridManager>().AsSelf();
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingSystemsRunner>().AsSelf();
@@ -49,6 +55,7 @@ namespace Infrastructure.Installers
             builder.RegisterComponentInHierarchy<BuildingInfoPanelView>().As<IBuildingInfoPanelView>();
             builder.RegisterComponentInHierarchy<ResourcePanelView>().As<IResourcePanelView>();
             builder.RegisterComponentInHierarchy<SaveLoadPanelView>().As<ISaveLoadPanelView>();
+            builder.RegisterComponentInHierarchy<GridView>().As<IGridView>();
 
             //Презентеры и системы
             builder.Register<BuildPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
@@ -58,6 +65,14 @@ namespace Infrastructure.Installers
             builder.Register<BuildingMoveSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
             builder.Register<ResourcePanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<SaveLoadPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register(resolver =>
+            {
+                IGridView view = resolver.Resolve<GridView>();
+                return new GridPresenter(view, this._gridWidth, this._gridHeight);
+            }, Lifetime.Singleton)
+                .As<IGridPresenter>()
+                .As<IInitializable>()
+                .AsSelf();
 
             //Input
             builder.Register(resolver =>

@@ -1,7 +1,7 @@
 ﻿using Domain.Gameplay;
 using Domain.Messages;
 using MessagePipe;
-using Presentation.UI;
+using Presentation.UI.Presenters;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,8 +14,8 @@ namespace Presentation.System
 {
     public class BuildingInteractionSystem : IInitializable, IDisposable
     {
+        private readonly IGridPresenter _gridPresenter;
         private readonly GridManager _gridManager;
-        private readonly GridView _gridView;
         private readonly IBuildingService _buildingService;
         private readonly ISubscriber<BuildingTypeSelectedMessage> _buildingTypeSelectedSubscriber;
         private readonly IPublisher<BuildingDeletedMessage> _buildingDeletedPublisher;
@@ -27,14 +27,14 @@ namespace Presentation.System
         private LayerMask _gridLayerMask = 1 << LayerMask.NameToLayer("Grid");
 
         public BuildingInteractionSystem(
+        IGridPresenter gridPresenter,
         GridManager gridManager,
-        GridView gridView,
         IBuildingService buildingService,
         ISubscriber<BuildingTypeSelectedMessage> buildingTypeSelectedSubscriber,
         IPublisher<BuildingDeletedMessage> buildingDeletedPublisher)
         {
+            this._gridPresenter = gridPresenter;
             this._gridManager = gridManager;
-            this._gridView = gridView;
             this._buildingService = buildingService;
             this._buildingTypeSelectedSubscriber = buildingTypeSelectedSubscriber;
             this._buildingDeletedPublisher = buildingDeletedPublisher;
@@ -74,9 +74,9 @@ namespace Presentation.System
 
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, this._gridLayerMask))
             {
-                GridPos gridPos = this._gridView.WorldToGrid(hit.point);
+                GridPos gridPos = this._gridManager.WorldToGrid(hit.point);
                 bool isValid = !this._gridManager.IsCellOccupied(gridPos);
-                this._gridView.ShowHighlight(gridPos, isValid);
+                this._gridPresenter.ShowHighlight(gridPos, isValid);
 
                 if (Mouse.current.leftButton.wasPressedThisFrame && isValid)
                 {
@@ -93,18 +93,13 @@ namespace Presentation.System
         private void PlaceBuildingAt(GridPos position)
         {
             Building building = this._buildingService.PlaceBuilding(this._selectedBuildingType, position, true);
-            if (building != null)
-            {
-                this._gridView.HideHighlight();
-            }
-
             this.CancelPlacement();
         }
 
         private void CancelPlacement()
         {
             this._isPlacingBuilding = false;
-            this._gridView.HideHighlight();
+            this._gridPresenter.HideHighlight();
             Debug.Log("Building placement canceled");
         }
 
@@ -122,17 +117,17 @@ namespace Presentation.System
 
                 if (Physics.Raycast(ray, out RaycastHit hit, 100f, this._gridLayerMask))
                 {
-                    GridPos gridPos = this._gridView.WorldToGrid(hit.point);
+                    GridPos gridPos = this._gridManager.WorldToGrid(hit.point);
                     Building building = this._buildingService.GetBuildingAt(gridPos);
 
                     if (building != null)
                     {
-                        this._gridView.ShowHighlight(gridPos, true);
+                        this._gridPresenter.ShowHighlight(gridPos, true);
                         this._buildingService.SelectBuilding(building);
                     }
                     else
                     {
-                        this._gridView.HideHighlight();
+                        this._gridPresenter.HideHighlight();
                         this._buildingService.DeselectBuilding();
                     }
                 }
