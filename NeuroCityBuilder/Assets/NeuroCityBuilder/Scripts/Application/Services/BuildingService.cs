@@ -4,13 +4,16 @@ using MessagePipe;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using NeuroCityBuilder.Application.Interfaces;
 
 namespace NeuroCityBuilder.Application.Services
 {
     public class BuildingService : IBuildingService
     {
         private readonly GridManager _gridManager;
-        private readonly BuildingFactory _buildingFactory;
+        private readonly IBuildingFactory _buildingFactory;
+        private readonly IBuildingLevelProvider _levelProvider;
+
         private readonly IPublisher<BuildingPlacedMessage> _buildingPlacedPublisher;
         private readonly IPublisher<BuildingDeletedMessage> _buildingDeletedPublisher;
         private readonly IPublisher<BuildingSelectedMessage> _buildingSelectedPublisher;
@@ -29,6 +32,9 @@ namespace NeuroCityBuilder.Application.Services
 
         public BuildingService(
         GridManager gridManager,
+        IResourceService resourceService,
+        IBuildingFactory buildingFactory,
+        IBuildingLevelProvider levelProvider,
         IPublisher<BuildingPlacedMessage> buildingPlacedPublisher,
         IPublisher<BuildingDeletedMessage> buildingDeletedPublisher,
         IPublisher<BuildingSelectedMessage> buildingSelectedPublisher,
@@ -36,11 +42,13 @@ namespace NeuroCityBuilder.Application.Services
         ISubscriber<BuildingDeleteRequestMessage> buildingDeleteRequestSubscriber,
         IPublisher<BuildingUpgradedMessage> buildingUpgradedPublisher,
         ISubscriber<BuildingUpgradeRequestMessage> buildingUpgradeRequestSubscriber,
-        ISubscriber<BuildingMoveRequestMessage> buildingMoveRequestSubscriber,
-        IResourceService resourceService,
-        BuildingFactory buildingFactory)
+        ISubscriber<BuildingMoveRequestMessage> buildingMoveRequestSubscriber)
         {
             this._gridManager = gridManager;
+            this._buildingFactory = buildingFactory;
+            this._resourceService = resourceService;
+            this._levelProvider = levelProvider;
+
             this._buildingPlacedPublisher = buildingPlacedPublisher;
             this._buildingDeletedPublisher = buildingDeletedPublisher;
             this._buildingSelectedPublisher = buildingSelectedPublisher;
@@ -49,8 +57,7 @@ namespace NeuroCityBuilder.Application.Services
             this._buildingUpgradedPublisher = buildingUpgradedPublisher;
             this._buildingUpgradeRequestSubscriber = buildingUpgradeRequestSubscriber;
             this._buildingMoveRequestSubscriber = buildingMoveRequestSubscriber;
-            this._buildingFactory = buildingFactory;
-            this._resourceService = resourceService;
+            
 
             this._deleteSubscription = this._buildingDeleteRequestSubscriber.Subscribe(this.HandleDeleteRequest);
             this._upgradeSubscription = this._buildingUpgradeRequestSubscriber.Subscribe(this.HandleUpgradeRequest);
@@ -67,7 +74,7 @@ namespace NeuroCityBuilder.Application.Services
                 return null;
             }
 
-            int buildingCost = this.GetBuildingCost(this._buildingFactory.GetBuildingLevels(type), 0);
+            int buildingCost = this.GetBuildingCost(this._levelProvider.GetLevels(type), 0);
 
             if (!this._resourceService.CanAfford(buildingCost) && isNewBuilding)
             {

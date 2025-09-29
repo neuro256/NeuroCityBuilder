@@ -233,6 +233,7 @@ MonoBehaviour:
   autoInjectGameObjects: []
   _gridWidth: 32
   _gridHeight: 32
+  _buildingLevelsConfig: {fileID: 11400000, guid: 5ea39140acfa74c4197e3712f95c48ed, type: 2}
 --- !u!1 &84487400
 GameObject:
   m_ObjectHideFlags: 0
@@ -1013,7 +1014,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6231916033764972492, guid: b4ae3359d52d04e45947402b3e9e7745, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

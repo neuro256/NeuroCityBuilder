@@ -1,10 +1,21 @@
-﻿namespace NeuroCityBuilder.Domain.Gameplay
+﻿using UnityEngine;
+
+namespace NeuroCityBuilder.Domain.Gameplay
 {
+    [System.Serializable]
     public class BuildingLevel
     {
-        public int Level { get; set; }
-        public int Cost { get; set; }
-        public int Income { get; set; }
+        [SerializeField]
+        private int _level;
+        [SerializeField]
+        private int _cost;
+        [SerializeField]
+        private int _income;
+
+
+        public int Level => this._level;
+        public int Cost => this._cost;
+        public int Income => this._income;
     }
 }
 
