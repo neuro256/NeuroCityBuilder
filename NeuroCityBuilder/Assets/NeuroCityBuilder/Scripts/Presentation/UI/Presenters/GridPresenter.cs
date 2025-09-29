@@ -1,4 +1,5 @@
-﻿using NeuroCityBuilder.Domain.Gameplay;
+﻿using NeuroCityBuilder.Application.Interfaces;
+using NeuroCityBuilder.Domain.Gameplay;
 using NeuroCityBuilder.Presentation.UI.Views;
 using UnityEngine;
 using VContainer;
@@ -12,8 +13,8 @@ namespace NeuroCityBuilder.Presentation.UI.Presenters
         private readonly int _width;
         private readonly int _height;
 
-        private readonly GridCell[,] _gridCells;
-        private GridCell _currentHighlightedCell;
+        private readonly IGridCell[,] _gridCells;
+        private IGridCell _currentHighlightedCell;
 
         [Inject]
         public GridPresenter(IGridView view, int width, int height)
@@ -42,7 +43,7 @@ namespace NeuroCityBuilder.Presentation.UI.Presenters
 
             this.HideHighlight();
 
-            GridCell cell = this._gridCells[gridPos.X, gridPos.Y];
+            IGridCell cell = this._gridCells[gridPos.X, gridPos.Y];
             if (cell != null)
             {
                 if (isValid)
@@ -91,7 +92,7 @@ namespace NeuroCityBuilder.Presentation.UI.Presenters
                 for (int y = 0; y < this._height; y++)
                 {
                     Vector3 position = new Vector3(x, 0.01f, y);
-                    GridCell cell = this._view.CreateCell(x, y, position);
+                    IGridCell cell = this._view.CreateCell(x, y, position);
                     this._gridCells[x, y] = cell;
                 }
             }

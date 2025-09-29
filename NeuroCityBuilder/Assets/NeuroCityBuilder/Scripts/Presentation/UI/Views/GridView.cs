@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using NeuroCityBuilder.Application.Interfaces;
+using UnityEngine;
+using VContainer;
 
 namespace NeuroCityBuilder.Presentation.UI.Views
 {
@@ -6,21 +8,29 @@ namespace NeuroCityBuilder.Presentation.UI.Views
     {
         [Header("Parent")]
         [SerializeField] private Transform _parent;
-        [Header("Prefab")]
-        [SerializeField] private GridCell _gridCellPrefab;
 
-        public GridCell CreateCell(int x, int y, Vector3 position)
+        private IGridCellFactory _cellFactory;
+        private IObjectDestroyer _destroyer;
+
+        [Inject]
+        public void Construct(IGridCellFactory cellFactory, IObjectDestroyer destroyer)
         {
-            GridCell cell = Instantiate(this._gridCellPrefab, position, Quaternion.Euler(90, 0, 0), this._parent);
-            cell.name = $"GridCell_{x}_{y}";
-            return cell;
+            this._cellFactory = cellFactory;
+            this._destroyer = destroyer;
         }
 
-        public void RemoveCell(GridCell cell)
+        public IGridCell CreateCell(int x, int y, Vector3 position)
         {
-            if (cell != null && cell.gameObject != null)
+            return this._cellFactory.Create(position, this._parent, x, y);
+        }
+
+        public void RemoveCell(IGridCell cell)
+        {
+            GridCell gridCell = cell as GridCell;
+            
+            if (gridCell != null && gridCell.gameObject != null)
             {
-                Destroy(cell.gameObject);
+                this._destroyer.Destroy(gridCell.gameObject);
             }
         }
 
@@ -32,7 +42,7 @@ namespace NeuroCityBuilder.Presentation.UI.Views
             {
                 if (child != null && child.gameObject != null)
                 {
-                    Destroy(child.gameObject);
+                    this._destroyer.Destroy(child.gameObject);
                 }
             }
         }
