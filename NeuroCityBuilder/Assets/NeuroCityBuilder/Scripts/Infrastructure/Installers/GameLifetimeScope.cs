@@ -46,8 +46,11 @@ namespace NeuroCityBuilder.Infrastructure.Installers
                 return new GridManager(this._gridWidth, this._gridHeight);
             }, Lifetime.Singleton).AsSelf();
             builder.Register<IBuildingFactory, BuildingFactory>(Lifetime.Singleton);
+            builder.Register<IGridCellFactory, GridCellFactory>(Lifetime.Singleton);
+            builder.Register<IObjectDestroyer, ObjectDestroyer>(Lifetime.Singleton);
 
             //Компоненты сцены
+            builder.RegisterComponentInHierarchy<GridPrefabProvider>().As<IGridPrefabProvider>();
             builder.RegisterComponentInHierarchy<BuildingPrefabProvider>().As<IBuildingPrefabProvider>();
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();

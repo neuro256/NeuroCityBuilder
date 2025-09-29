@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using NeuroCityBuilder.Application.Interfaces;
+using UnityEngine;
 
 namespace NeuroCityBuilder.Presentation.UI
 {
-    public class GridCell : MonoBehaviour
+    public class GridCell : MonoBehaviour, IGridCell
     {
         [SerializeField] private Renderer _renderer;
         [SerializeField] private Material _defaultMaterial;
