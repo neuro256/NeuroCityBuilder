@@ -1,36 +1,40 @@
-﻿using NeuroCityBuilder.Domain.Gameplay;
+﻿using NeuroCityBuilder.Application.Interfaces;
+using NeuroCityBuilder.Domain.Gameplay;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace NeuroCityBuilder.Application
 {
-    public class BuildingFactory : MonoBehaviour
+    public interface IBuildingFactory : System.IDisposable
+    {
+        Building CreateBuilding(BuildingType type, GridPos position);
+        GameObject CreateGhostBuilding(BuildingType type, Vector3 position);
+        void DestroyGhostBuilding();
+        void UpdateGhostBuildingPosition(Vector3 position);
+        void RemoveBuildingVisual(GridPos position);
+    }
+
+    public class BuildingFactory : IBuildingFactory
     {
         private const float _ghostY = 1.5f;
         private const float _buildZ = 0.5f;
 
-        [Header("Building Prefabs")]
-        [SerializeField] private GameObject _housePrefab;
-        [SerializeField] private GameObject _farmPrefab;
-        [SerializeField] private GameObject _minePrefab;
-        [SerializeField] private Transform _buildingsParent;
-
-        [Header("Ghost Prefabs")]
-        [SerializeField] private GameObject _houseGhostPrefab;
-        [SerializeField] private GameObject _farmGhostPrefab;
-        [SerializeField] private GameObject _mineGhostPrefab;
-
+        private readonly IBuildingPrefabProvider _prefabProvider;
+        private readonly IBuildingLevelProvider _levelProvider;
         private readonly Dictionary<GridPos, GameObject> _buildingInstances = new();
         private GameObject _ghostBuilding;
 
-        private void OnDestroy()
+        public BuildingFactory(IBuildingPrefabProvider prefabProvider, 
+            IBuildingLevelProvider levelProvider)
         {
-            this.ClearAllBuildings();
+            this._prefabProvider = prefabProvider;
+            this._levelProvider = levelProvider;
         }
 
         public Building CreateBuilding(BuildingType type, GridPos position)
         {
-            GameObject prefab = this.GetPrefabByType(type);
+            GameObject prefab = this._prefabProvider.GetBuildingPrefab(type);
+
             if (prefab == null)
             {
                 Debug.LogError($"CreateBuilding prefab is null");
@@ -38,14 +42,14 @@ namespace NeuroCityBuilder.Application
             }
 
             Vector3 worldPosition = new Vector3(position.X, _buildZ, position.Y);
-            GameObject buildingGO = Object.Instantiate(prefab, worldPosition, Quaternion.identity, this._buildingsParent);
+            GameObject buildingGO = UnityEngine.Object.Instantiate(prefab, worldPosition, Quaternion.identity, this._prefabProvider.Parent);
 
             Building building = new Building
             {
                 Type = type,
                 Position = position,
                 CurrentLevel = 0,
-                Levels = this.GetBuildingLevels(type)
+                Levels = this._levelProvider.GetLevels(type)
             };
 
             this._buildingInstances[position] = buildingGO;
@@ -57,7 +61,8 @@ namespace NeuroCityBuilder.Application
         {
             this.DestroyGhostBuilding();
 
-            GameObject ghostPrefab = this.GetGhostPrefabByType(type);
+            GameObject ghostPrefab = this._prefabProvider.GetGhostPrefab(type);
+
             if (ghostPrefab == null)
             {
                 Debug.LogError($"Ghost prefab is null for type: {type}");
@@ -75,7 +80,7 @@ namespace NeuroCityBuilder.Application
         {
             if (this._ghostBuilding != null)
             {
-                Destroy(this._ghostBuilding);
+                Object.Destroy(this._ghostBuilding);
                 this._ghostBuilding = null;
             }
         }
@@ -92,73 +97,25 @@ namespace NeuroCityBuilder.Application
         {
             if (this._buildingInstances.TryGetValue(position, out GameObject buildingGO))
             {
-                Destroy(buildingGO);
+                Object.Destroy(buildingGO);
                 this._buildingInstances.Remove(position);
                 Debug.Log($"Building visual removed from {position.X},{position.Y}");
             }
         }
 
-        private GameObject GetPrefabByType(BuildingType type)
+        public void Dispose()
         {
-            Debug.Log($"GetPrefabByType: {type}");
-            return type switch
-            {
-                BuildingType.House => this._housePrefab,
-                BuildingType.Farm => this._farmPrefab,
-                BuildingType.Mine => this._minePrefab,
-                _ => null
-            };
+            this.ClearAllBuildings();
         }
 
-        private GameObject GetGhostPrefabByType(BuildingType type)
-        {
-            return type switch
-            {
-                BuildingType.House => this._houseGhostPrefab,
-                BuildingType.Farm => this._farmGhostPrefab,
-                BuildingType.Mine => this._mineGhostPrefab,
-                _ => null
-            };
-        }
-
-        public void ClearAllBuildings()
+        private void ClearAllBuildings()
         {
             foreach (GameObject buildingGO in this._buildingInstances.Values)
             {
                 if (buildingGO != null)
-                    Destroy(buildingGO);
+                    Object.Destroy(buildingGO);
             }
             this._buildingInstances.Clear();
-        }
-
-        public BuildingLevel[] GetBuildingLevels(BuildingType type)
-        {
-            switch (type)
-            {
-                case BuildingType.House:
-                    return new[]
-                    {
-                        new BuildingLevel { Level = 1, Cost = 100, Income = 10 },
-                        new BuildingLevel { Level = 2, Cost = 200, Income = 25 },
-                        new BuildingLevel { Level = 3, Cost = 300, Income = 35 }
-            };
-                case BuildingType.Farm:
-                    return new[]
-                    {
-                        new BuildingLevel { Level = 1, Cost = 150, Income = 15 },
-                        new BuildingLevel { Level = 2, Cost = 300, Income = 35 },
-                        new BuildingLevel { Level = 3, Cost = 500, Income = 45 }
-            };
-                case BuildingType.Mine:
-                    return new[]
-                    {
-                        new BuildingLevel { Level = 1, Cost = 200, Income = 20 },
-                        new BuildingLevel { Level = 2, Cost = 400, Income = 50 },
-                        new BuildingLevel { Level = 3, Cost = 600, Income = 80 }
-            };
-                default:
-                    return new BuildingLevel[0];
-            }
         }
     }
 }

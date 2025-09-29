@@ -10,6 +10,7 @@ using VContainer.Unity;
 using NeuroCityBuilder.Application.Services;
 using NeuroCityBuilder.Application;
 using NeuroCityBuilder.Infrastructure.Camera;
+using NeuroCityBuilder.Application.Interfaces;
 
 namespace NeuroCityBuilder.Infrastructure.Installers
 {
@@ -17,6 +18,7 @@ namespace NeuroCityBuilder.Infrastructure.Installers
     {
         [SerializeField] private int _gridWidth = 32;
         [SerializeField] private int _gridHeight = 32;
+        [SerializeField] private BuildingLevelsConfig _buildingLevelsConfig;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -43,9 +45,10 @@ namespace NeuroCityBuilder.Infrastructure.Installers
             {
                 return new GridManager(this._gridWidth, this._gridHeight);
             }, Lifetime.Singleton).AsSelf();
+            builder.Register<IBuildingFactory, BuildingFactory>(Lifetime.Singleton);
 
             //Компоненты сцены
-            builder.RegisterComponentInHierarchy<BuildingFactory>().AsSelf();
+            builder.RegisterComponentInHierarchy<BuildingPrefabProvider>().As<IBuildingPrefabProvider>();
             builder.RegisterComponentInHierarchy<GridView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingSystemsRunner>().AsSelf();
@@ -82,6 +85,8 @@ namespace NeuroCityBuilder.Infrastructure.Installers
             }, Lifetime.Singleton);
 
             builder.Register<CameraInputHandler>(Lifetime.Singleton).AsImplementedInterfaces();
+
+            builder.RegisterInstance(this._buildingLevelsConfig).As<IBuildingLevelProvider>().AsSelf();
 
             builder.RegisterEntryPoint<GameEntryPoint>(Lifetime.Singleton);
         }

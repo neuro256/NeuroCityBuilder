@@ -18,7 +18,7 @@ namespace NeuroCityBuilder.Presentation.System
         private readonly IBuildingService _buildingService;
         private readonly GridManager _gridManager;
         private readonly GridPresenter _gridPresenter;
-        private readonly BuildingFactory _buildingFactory;
+        private readonly IBuildingFactory _buildingFactory;
         private readonly IPublisher<BuildingMoveStartMessage> _buildingMoveStartPublisher;
         private readonly IPublisher<BuildingMoveCompleteMessage> _buildingMoveCompletePublisher;
         private readonly IPublisher<BuildingMoveCancelMessage> _buildingMoveCancelPublisher;
@@ -34,7 +34,7 @@ namespace NeuroCityBuilder.Presentation.System
             IBuildingService buildingService,
             GridManager gridManager,
             GridPresenter gridPresenter,
-            BuildingFactory buildingFactory,
+            IBuildingFactory buildingFactory,
             IPublisher<BuildingMoveStartMessage> buildingMoveStartPublisher,
             IPublisher<BuildingMoveCompleteMessage> buildingMoveCompletePublisher,
             IPublisher<BuildingMoveCancelMessage> buildingMoveCancelPublisher)
