@@ -9,22 +9,18 @@ namespace NeuroCityBuilder.Presentation.UI.Presenters
     public class GridPresenter : IGridPresenter
     {
         private readonly IGridView _view;
-
-        private readonly int _width;
-        private readonly int _height;
+        private readonly IGridConfig _gridConfig;
 
         private readonly IGridCell[,] _gridCells;
         private IGridCell _currentHighlightedCell;
 
         [Inject]
-        public GridPresenter(IGridView view, int width, int height)
+        public GridPresenter(IGridView view, IGridConfig gridConfig)
         {
             this._view = view;
+            this._gridConfig = gridConfig;
 
-            this._width = width;
-            this._height = height;
-
-            this._gridCells = new GridCell[this._width, this._height];
+            this._gridCells = new GridCell[this._gridConfig.Width, this._gridConfig.Height];
         }
 
         public void Initialize()
@@ -62,9 +58,9 @@ namespace NeuroCityBuilder.Presentation.UI.Presenters
 
         private void ClearAllCells()
         {
-            for (int x = 0; x < this._width; x++)
+            for (int x = 0; x < this._gridConfig.Width; x++)
             {
-                for (int y = 0; y < this._height; y++)
+                for (int y = 0; y < this._gridConfig.Height; y++)
                 {
                     if (this._gridCells[x, y] != null)
                     {
@@ -80,16 +76,16 @@ namespace NeuroCityBuilder.Presentation.UI.Presenters
 
         private bool IsValidPosition(GridPos pos)
         {
-            return pos.X >= 0 && pos.X < this._width && pos.Y >= 0 && pos.Y < this._height;
+            return pos.X >= 0 && pos.X < this._gridConfig.Width && pos.Y >= 0 && pos.Y < this._gridConfig.Height;
         }
 
         private void CreateGrid()
         {
             this.ClearAllCells();
 
-            for (int x = 0; x < this._width; x++)
+            for (int x = 0; x < this._gridConfig.Width; x++)
             {
-                for (int y = 0; y < this._height; y++)
+                for (int y = 0; y < this._gridConfig.Height; y++)
                 {
                     Vector3 position = new Vector3(x, 0.01f, y);
                     IGridCell cell = this._view.CreateCell(x, y, position);

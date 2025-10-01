@@ -1,4 +1,5 @@
-﻿using NeuroCityBuilder.Domain.Gameplay;
+﻿using NeuroCityBuilder.Application.Interfaces;
+using NeuroCityBuilder.Domain.Gameplay;
 using UnityEngine;
 
 namespace NeuroCityBuilder.Application
@@ -9,11 +10,12 @@ namespace NeuroCityBuilder.Application
         private int _width;
         private int _height;
 
-        public GridManager(int width, int height)
+        public GridManager(IGridConfig gridConfig)
         {
-            this._width = width;
-            this._height = height;
-            this._occupiedCells = new bool[width, height];
+            this._width = gridConfig.Width;
+            this._height = gridConfig.Height;
+
+            this._occupiedCells = new bool[this._width, this._height];
         }
 
         public bool IsCellOccupied(GridPos pos)

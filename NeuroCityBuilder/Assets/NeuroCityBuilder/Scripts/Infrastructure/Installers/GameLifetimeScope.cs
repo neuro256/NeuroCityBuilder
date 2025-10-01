@@ -1,58 +1,18 @@
-﻿using NeuroCityBuilder.Domain.Messages;
-using MessagePipe;
+﻿using NeuroCityBuilder.Infrastructure.Camera;
 using NeuroCityBuilder.Presentation.System;
 using NeuroCityBuilder.Presentation.UI;
 using NeuroCityBuilder.Presentation.UI.Presenters;
 using NeuroCityBuilder.Presentation.UI.Views;
-using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using NeuroCityBuilder.Application.Services;
-using NeuroCityBuilder.Application;
-using NeuroCityBuilder.Infrastructure.Camera;
-using NeuroCityBuilder.Application.Interfaces;
 
 namespace NeuroCityBuilder.Infrastructure.Installers
 {
     public class GameLifetimeScope : LifetimeScope
     {
-        [SerializeField] private int _gridWidth = 32;
-        [SerializeField] private int _gridHeight = 32;
-        [SerializeField] private BuildingLevelsConfig _buildingLevelsConfig;
-
         protected override void Configure(IContainerBuilder builder)
         {
-            MessagePipeOptions options = builder.RegisterMessagePipe();
-            builder.RegisterMessageBroker<BuildingTypeSelectedMessage>(options);
-            builder.RegisterMessageBroker<BuildingPlacedMessage>(options);
-            builder.RegisterMessageBroker<BuildingDeletedMessage>(options);
-            builder.RegisterMessageBroker<BuildingDeselectedMessage>(options);
-            builder.RegisterMessageBroker<BuildingDeleteRequestMessage>(options);
-            builder.RegisterMessageBroker<BuildingSelectedMessage>(options);
-            builder.RegisterMessageBroker<BuildingUpgradedMessage>(options);
-            builder.RegisterMessageBroker<BuildingMoveRequestMessage>(options);
-            builder.RegisterMessageBroker<BuildingMoveStartMessage>(options);
-            builder.RegisterMessageBroker<BuildingMoveCompleteMessage>(options);
-            builder.RegisterMessageBroker<BuildingMoveCancelMessage>(options);
-            builder.RegisterMessageBroker<GoldAddedMessage>(options);   
-
-            //Сервисы
-            builder.Register<IBuildingService, BuildingService>(Lifetime.Singleton);
-            builder.Register<IResourceService, ResourceService>(Lifetime.Singleton);
-            builder.Register<IIncomeService, IncomeService>(Lifetime.Singleton);
-            builder.Register<IGameSaveService, GameSaveService>(Lifetime.Singleton);
-            builder.Register(resolver =>
-            {
-                return new GridManager(this._gridWidth, this._gridHeight);
-            }, Lifetime.Singleton).AsSelf();
-            builder.Register<IBuildingFactory, BuildingFactory>(Lifetime.Singleton);
-            builder.Register<IGridCellFactory, GridCellFactory>(Lifetime.Singleton);
-            builder.Register<IObjectDestroyer, ObjectDestroyer>(Lifetime.Singleton);
-
             //Компоненты сцены
-            builder.RegisterComponentInHierarchy<GridPrefabProvider>().As<IGridPrefabProvider>();
-            builder.RegisterComponentInHierarchy<BuildingPrefabProvider>().As<IBuildingPrefabProvider>();
-            builder.RegisterComponentInHierarchy<GridView>().AsSelf();
             builder.RegisterComponentInHierarchy<CameraController>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildingSystemsRunner>().AsSelf();
             builder.RegisterComponentInHierarchy<BuildPanelView>().As<IBuildPanelView>();
@@ -70,11 +30,7 @@ namespace NeuroCityBuilder.Infrastructure.Installers
             builder.Register<BuildingMoveSystem>(Lifetime.Singleton).AsImplementedInterfaces().AsSelf();
             builder.Register<ResourcePanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<SaveLoadPanelPresenter>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register(resolver =>
-            {
-                IGridView view = resolver.Resolve<GridView>();
-                return new GridPresenter(view, this._gridWidth, this._gridHeight);
-            }, Lifetime.Singleton)
+            builder.Register<GridPresenter>(Lifetime.Singleton)
                 .As<IGridPresenter>()
                 .As<IInitializable>()
                 .AsSelf();
@@ -88,8 +44,6 @@ namespace NeuroCityBuilder.Infrastructure.Installers
             }, Lifetime.Singleton);
 
             builder.Register<CameraInputHandler>(Lifetime.Singleton).AsImplementedInterfaces();
-
-            builder.RegisterInstance(this._buildingLevelsConfig).As<IBuildingLevelProvider>().AsSelf();
 
             builder.RegisterEntryPoint<GameEntryPoint>(Lifetime.Singleton);
         }
